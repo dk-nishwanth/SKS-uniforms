@@ -23,7 +23,7 @@ const Orders: React.FC = () => {
           price: '₹8,500',
           size: 'L',
           category: 'Corporate',
-          image: './components/Assets/Business Suit 1.png',
+          image: '/images/Business Suit 1.png',
           description: 'Professional business suit with tailored fit.'
         }
       ]
@@ -41,7 +41,7 @@ const Orders: React.FC = () => {
           price: '₹2,500',
           size: 'M',
           category: 'Schools',
-          image: './components/Assets/School Uniform 1.png',
+          image: '/images/School Uniform 1.png',
           description: 'Premium quality school blazer with embroidered crest.'
         },
         { 
@@ -51,7 +51,7 @@ const Orders: React.FC = () => {
           price: '₹3,200',
           size: 'L',
           category: 'Schools',
-          image: './components/Assets/School Uniform 2.png',
+          image: '/images/School Uniform 2.png',
           description: 'Complete school uniform set with professional finish.'
         }
       ]
@@ -69,7 +69,7 @@ const Orders: React.FC = () => {
           price: '₹1,800',
           size: 'M',
           category: 'Healthcare',
-          image: './components/Assets/Medical Uniform 1.png',
+          image: '/images/Medical Uniform 1.png',
           description: 'Comfortable and durable medical scrubs for healthcare professionals.'
         }
       ]

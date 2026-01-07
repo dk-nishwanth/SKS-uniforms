@@ -30,7 +30,7 @@ const Hero: React.FC = () => {
       {/* Left Pane */}
       <div className="relative flex-1 h-1/2 md:h-full overflow-hidden group">
         <img 
-          src="./components/Assets/Business Suit 1.png" 
+          src="/images/Business Suit 1.png" 
           alt="Professional Uniforms" 
           className="w-full h-full object-cover grayscale brightness-75 transition-transform duration-700 group-hover:scale-105"
         />
@@ -70,7 +70,7 @@ const Hero: React.FC = () => {
       {/* Right Pane (Image Only) */}
       <div className="hidden md:block flex-1 h-full overflow-hidden">
         <img 
-          src="./components/Assets/School Uniform 1.png" 
+          src="/images/School Uniform 1.png" 
           alt="School Uniforms" 
           className="w-full h-full object-cover grayscale brightness-50"
         />

@@ -39,7 +39,7 @@ const App: React.FC = () => {
         <section className="border-b border-black">
             <div className="flex flex-col lg:flex-row divide-y lg:divide-y-0 lg:divide-x divide-black">
                 <div className="flex-1 group relative overflow-hidden aspect-square lg:aspect-auto h-[600px] lg:h-[800px] cursor-pointer">
-                    <img src="./components/Assets/School Uniform 2.png" className="w-full h-full object-cover grayscale brightness-75 group-hover:scale-105 transition-all duration-1000" alt="School Uniforms" />
+                    <img src="/images/School Uniform 2.png" className="w-full h-full object-cover grayscale brightness-75 group-hover:scale-105 transition-all duration-1000" alt="School Uniforms" />
                     <div className="absolute bottom-16 left-12">
                         <h3 className="font-heading text-8xl text-white mb-6 tracking-tighter drop-shadow-lg">SCHOOL <br/> UNIFORMS</h3>
                         <Link 
@@ -65,7 +65,7 @@ const App: React.FC = () => {
                         </Link>
                     </div>
                     <div className="h-[400px] overflow-hidden">
-                        <img src="./components/Assets/Corporate Uniform 2.png" className="w-full h-full object-cover grayscale brightness-50" alt="Corporate Uniforms" />
+                        <img src="/images/Corporate Uniform 2.png" className="w-full h-full object-cover grayscale brightness-50" alt="Corporate Uniforms" />
                     </div>
                 </div>
             </div>
@@ -76,9 +76,9 @@ const App: React.FC = () => {
             <div className="max-w-[1400px] mx-auto px-8">
                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {[
-                        { title: "SCHOOLS", img: "./components/Assets/College Uniform 1.png", subtitle: "Educational Excellence", link: "/schools" },
-                        { title: "HEALTHCARE", img: "./components/Assets/Hospital Uniform 1.png", subtitle: "Medical Professionals", link: "/healthcare" },
-                        { title: "CORPORATE", img: "./components/Assets/Business Uniform 1.png", subtitle: "Business Solutions", link: "/corporate" }
+                        { title: "SCHOOLS", img: "/images/College Uniform 1.png", subtitle: "Educational Excellence", link: "/schools" },
+                        { title: "HEALTHCARE", img: "/images/Hospital Uniform 1.png", subtitle: "Medical Professionals", link: "/healthcare" },
+                        { title: "CORPORATE", img: "/images/Business Uniform 1.png", subtitle: "Business Solutions", link: "/corporate" }
                     ].map((cat, i) => (
                         <Link 
                           key={i} 
@@ -104,9 +104,9 @@ const App: React.FC = () => {
         <section className="bg-white">
             <div className="grid grid-cols-1 md:grid-cols-3 divide-x divide-black border-b border-black">
                 {[
-                    { title: "QUALITY ASSURANCE", text: "Every uniform undergoes rigorous quality checks to ensure durability and comfort. Our commitment to excellence means your institution gets the best.", img: "./components/Assets/Medical Uniform 1.png", link: "/about" },
-                    { title: "CUSTOM EMBROIDERY", text: "Personalize your uniforms with institutional logos, names, and badges. Our precision embroidery services add that professional touch.", img: "./components/Assets/Corporate Uniform 1.png", link: "/contact" },
-                    { title: "BULK ORDERS", text: "Special pricing for institutional bulk orders. Contact us for customized solutions that fit your budget and requirements.", img: "./components/Assets/Hotel Uniform 1.png", link: "/contact" }
+                    { title: "QUALITY ASSURANCE", text: "Every uniform undergoes rigorous quality checks to ensure durability and comfort. Our commitment to excellence means your institution gets the best.", img: "/images/Medical Uniform 1.png", link: "/about" },
+                    { title: "CUSTOM EMBROIDERY", text: "Personalize your uniforms with institutional logos, names, and badges. Our precision embroidery services add that professional touch.", img: "/images/Corporate Uniform 1.png", link: "/contact" },
+                    { title: "BULK ORDERS", text: "Special pricing for institutional bulk orders. Contact us for customized solutions that fit your budget and requirements.", img: "/images/Hotel Uniform 1.png", link: "/contact" }
                 ].map((item, i) => (
                     <div key={i} className="flex flex-col group cursor-pointer">
                         <div className="aspect-video overflow-hidden border-b border-black bg-zinc-100">

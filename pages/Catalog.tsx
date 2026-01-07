@@ -87,7 +87,7 @@ const Catalog: React.FC = () => {
         <section className="relative h-[50vh] w-full flex items-center justify-center border-b border-black">
           <div className="absolute inset-0">
             <img 
-              src="./components/Assets/Business Uniform 1.png" 
+              src="/images/Business Uniform 1.png" 
               alt="Uniform Catalog" 
               className="w-full h-full object-cover grayscale brightness-50"
             />

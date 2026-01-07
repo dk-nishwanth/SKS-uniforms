@@ -45,7 +45,7 @@ const Women: React.FC = () => {
         <section className="relative h-[70vh] w-full flex items-center justify-center border-b border-black">
           <div className="absolute inset-0">
             <img 
-              src="./components/Assets/Medical Uniform 1.png" 
+              src="/images/Medical Uniform 1.png" 
               alt="Women's Uniforms" 
               className="w-full h-full object-cover grayscale brightness-60"
             />

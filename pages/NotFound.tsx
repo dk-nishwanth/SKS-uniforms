@@ -12,7 +12,7 @@ const NotFound: React.FC = () => {
         <div className="text-center px-8">
           <div className="mb-8">
             <img 
-              src="./components/Assets/Business Suit 1.png" 
+              src="/images/Business Suit 1.png" 
               alt="SKS Uniforms" 
               className="w-48 h-48 mx-auto object-cover grayscale opacity-30"
             />

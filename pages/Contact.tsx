@@ -82,7 +82,7 @@ const Contact: React.FC = () => {
         <section className="relative h-[50vh] w-full flex items-center justify-center border-b border-black">
           <div className="absolute inset-0">
             <img 
-              src="./components/Assets/Corporate Uniform 1.png" 
+              src="/images/Corporate Uniform 1.png" 
               alt="Contact SKS Uniforms" 
               className="w-full h-full object-cover grayscale brightness-40"
             />

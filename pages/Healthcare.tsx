@@ -9,7 +9,7 @@ const HEALTHCARE_PRODUCTS: Product[] = [
     name: 'MEDICAL SCRUBS - WHITE',
     price: '₹1,800',
     category: 'Healthcare',
-    image: './components/Assets/Medical Uniform 1.png',
+    image: '/images/Medical Uniform 1.png',
     description: 'Comfortable and durable medical scrubs for healthcare professionals.',
     isNew: true
   },
@@ -18,7 +18,7 @@ const HEALTHCARE_PRODUCTS: Product[] = [
     name: 'HOSPITAL UNIFORM - WHITE',
     price: '₹2,200',
     category: 'Healthcare',
-    image: './components/Assets/Hospital Uniform 1.png',
+    image: '/images/Hospital Uniform 1.png',
     description: 'Classic hospital uniform with modern cut and professional finish.',
     isNew: true
   },
@@ -27,7 +27,7 @@ const HEALTHCARE_PRODUCTS: Product[] = [
     name: 'DOCTOR COAT - WHITE',
     price: '₹2,800',
     category: 'Healthcare',
-    image: './components/Assets/Medical Uniform 1.png',
+    image: '/images/Medical Uniform 1.png',
     description: 'Professional doctor coat with multiple pockets and comfortable fit.',
     isNew: false
   },
@@ -36,7 +36,7 @@ const HEALTHCARE_PRODUCTS: Product[] = [
     name: 'NURSE UNIFORM - BLUE TRIM',
     price: '₹2,000',
     category: 'Healthcare',
-    image: './components/Assets/Hospital Uniform 1.png',
+    image: '/images/Hospital Uniform 1.png',
     description: 'Modern nurse uniform with blue trim and ergonomic design.',
     isNew: false
   },
@@ -45,7 +45,7 @@ const HEALTHCARE_PRODUCTS: Product[] = [
     name: 'SURGICAL SCRUBS - GREEN',
     price: '₹2,100',
     category: 'Healthcare',
-    image: './components/Assets/Medical Uniform 1.png',
+    image: '/images/Medical Uniform 1.png',
     description: 'Sterile surgical scrubs for operating room professionals.',
     isNew: true
   },
@@ -54,7 +54,7 @@ const HEALTHCARE_PRODUCTS: Product[] = [
     name: 'LAB COAT - LONG SLEEVE',
     price: '₹1,900',
     category: 'Healthcare',
-    image: './components/Assets/Hospital Uniform 1.png',
+    image: '/images/Hospital Uniform 1.png',
     description: 'Laboratory coat with chemical-resistant fabric and secure closures.',
     isNew: false
   }
@@ -76,7 +76,7 @@ const Healthcare: React.FC = () => {
         <section className="relative h-[70vh] w-full flex items-center justify-center border-b border-black">
           <div className="absolute inset-0">
             <img 
-              src="./components/Assets/Medical Uniform 1.png" 
+              src="/images/Medical Uniform 1.png" 
               alt="Healthcare Uniforms" 
               className="w-full h-full object-cover grayscale brightness-60"
             />

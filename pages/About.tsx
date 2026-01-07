@@ -12,7 +12,7 @@ const About: React.FC = () => {
         <section className="relative h-[60vh] w-full flex items-center justify-center border-b border-black">
           <div className="absolute inset-0">
             <img 
-              src="./components/Assets/Corporate Uniform 2.png" 
+              src="/images/Corporate Uniform 2.png" 
               alt="About SKS Uniforms" 
               className="w-full h-full object-cover grayscale brightness-50"
             />
@@ -55,7 +55,7 @@ const About: React.FC = () => {
               </div>
               <div className="relative">
                 <img 
-                  src="./components/Assets/Business Uniform 1.png" 
+                  src="/images/Business Uniform 1.png" 
                   alt="Professional Uniforms" 
                   className="w-full h-[500px] object-cover grayscale"
                 />
@@ -121,7 +121,7 @@ const About: React.FC = () => {
               <div className="group cursor-pointer">
                 <div className="aspect-[4/5] overflow-hidden border border-black mb-6">
                   <img 
-                    src="./components/Assets/School Uniform 2.png" 
+                    src="/images/School Uniform 2.png" 
                     alt="Educational Uniforms" 
                     className="w-full h-full object-cover grayscale group-hover:scale-105 transition-transform duration-700"
                   />
@@ -135,7 +135,7 @@ const About: React.FC = () => {
               <div className="group cursor-pointer">
                 <div className="aspect-[4/5] overflow-hidden border border-black mb-6">
                   <img 
-                    src="./components/Assets/Hospital Uniform 1.png" 
+                    src="/images/Hospital Uniform 1.png" 
                     alt="Healthcare Uniforms" 
                     className="w-full h-full object-cover grayscale group-hover:scale-105 transition-transform duration-700"
                   />
@@ -149,7 +149,7 @@ const About: React.FC = () => {
               <div className="group cursor-pointer">
                 <div className="aspect-[4/5] overflow-hidden border border-black mb-6">
                   <img 
-                    src="./components/Assets/Hotel Uniform 1.png" 
+                    src="/images/Hotel Uniform 1.png" 
                     alt="Corporate Uniforms" 
                     className="w-full h-full object-cover grayscale group-hover:scale-105 transition-transform duration-700"
                   />
