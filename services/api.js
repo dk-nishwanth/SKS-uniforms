@@ -21,6 +21,14 @@ class ApiService {
       const data = await response.json();
 
       if (!response.ok) {
+        const errorData = data;
+        if (response.status === 400 && errorData.errors) {
+          // Validation error - pass the full response for better error handling
+          const error = new Error(errorData.message || 'Validation failed');
+          error.validationErrors = errorData.errors;
+          error.response = errorData;
+          throw error;
+        }
         throw new Error(data.message || `API request failed with status ${response.status}`);
       }
 

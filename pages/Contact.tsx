@@ -52,7 +52,7 @@ const Contact: React.FC = () => {
       // Submit form data to backend
       const response = await apiService.submitContactForm(formData);
       
-      if (response.success) {
+      if (response && response.success) {
         setSubmitMessage('Thank you for your inquiry! We will get back to you within 24 hours. Your message has been sent to our team.');
         setFormData({
           name: '',
@@ -64,14 +64,31 @@ const Contact: React.FC = () => {
           inquiryType: 'general'
         });
       } else {
-        setSubmitMessage('There was an issue with your submission. Please try again or contact us directly.');
+        console.error('API returned unsuccessful response:', response);
+        if (response && response.errors && response.errors.length > 0) {
+          const errorMessages = response.errors.map(err => err.msg).join('. ');
+          setSubmitMessage(`Please fix the following errors: ${errorMessages}`);
+        } else {
+          setSubmitMessage('There was an issue with your submission. Please try again or contact us directly.');
+        }
       }
     } catch (error) {
       console.error('Contact form submission error:', error);
-      setSubmitMessage(`There was an error submitting your message. Please try again or contact us directly at duraikannan73@gmail.com or call +91 7338031038.`);
+      
+      // Handle validation errors specifically
+      if (error.validationErrors) {
+        const errorMessages = error.validationErrors.map(err => err.msg).join('. ');
+        setSubmitMessage(`Please fix the following: ${errorMessages}`);
+      } else if (error.message.includes('fetch')) {
+        setSubmitMessage('Unable to connect to the server. Please check your internet connection and try again.');
+      } else if (error.message.includes('CORS')) {
+        setSubmitMessage('Connection blocked by browser security. Please contact us directly at duraikannan73@gmail.com.');
+      } else {
+        setSubmitMessage(`There was an error submitting your message: ${error.message}. Please contact us directly at duraikannan73@gmail.com or call +91 7338031038.`);
+      }
     } finally {
       setIsSubmitting(false);
-      setTimeout(() => setSubmitMessage(''), 10000);
+      setTimeout(() => setSubmitMessage(''), 15000);
     }
   };
 
@@ -160,7 +177,11 @@ const Contact: React.FC = () => {
             </div>
 
             {submitMessage && (
-              <div className="mb-8 p-4 bg-green-50 border border-green-200 text-green-800 text-center">
+              <div className={`mb-8 p-4 border text-center ${
+                submitMessage.includes('Thank you') || submitMessage.includes('success') 
+                  ? 'bg-green-50 border-green-200 text-green-800' 
+                  : 'bg-red-50 border-red-200 text-red-800'
+              }`}>
                 {submitMessage}
               </div>
             )}
@@ -230,8 +251,10 @@ const Contact: React.FC = () => {
                     name="phone"
                     value={formData.phone}
                     onChange={handleInputChange}
+                    placeholder="e.g., 9876543210 or +919876543210"
                     className="w-full px-4 py-3 border border-black text-sm focus:outline-none focus:ring-2 focus:ring-black focus:ring-inset"
                   />
+                  <p className="text-xs text-zinc-500 mt-1">Enter 10-15 digits, with or without country code</p>
                 </div>
                 
                 <div>
@@ -276,10 +299,13 @@ const Contact: React.FC = () => {
                   value={formData.message}
                   onChange={handleInputChange}
                   rows={6}
-                  placeholder="Please provide details about your requirements, quantity needed, timeline, and any specific customization needs..."
+                  placeholder="Please provide details about your requirements, quantity needed, timeline, and any specific customization needs... (minimum 10 characters)"
                   className="w-full px-4 py-3 border border-black text-sm focus:outline-none focus:ring-2 focus:ring-black focus:ring-inset resize-none"
                   required
                 />
+                <p className="text-xs text-zinc-500 mt-1">
+                  {formData.message.length}/2000 characters (minimum 10 required)
+                </p>
               </div>
 
               <button

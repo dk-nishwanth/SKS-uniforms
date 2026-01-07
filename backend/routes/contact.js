@@ -34,8 +34,8 @@ const contactValidation = [
   
   body('phone')
     .optional()
-    .matches(/^[\+]?[1-9][\d]{0,15}$/)
-    .withMessage('Please provide a valid phone number'),
+    .matches(/^[\+]?[0-9]{10,15}$/)
+    .withMessage('Please provide a valid phone number (10-15 digits)'),
   
   body('organization')
     .optional()
