@@ -4,7 +4,7 @@ import Footer from '../components/Footer';
 import { useApp } from '../contexts/AppContext';
 
 const SizeGuide: React.FC = () => {
-  const { bookConsultation } = useApp();
+  const { bookConsultation, enquiryCount } = useApp();
 
   const handleBookConsultation = async () => {
     const contactInfo = {
@@ -25,7 +25,7 @@ const SizeGuide: React.FC = () => {
   };
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      <Navbar cartCount={0} />
+      <Navbar enquiryCount={enquiryCount} />
       
       <main className="flex-grow pt-20">
         {/* Hero Section */}

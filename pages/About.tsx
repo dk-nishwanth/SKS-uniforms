@@ -1,11 +1,15 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import { useApp } from '../contexts/AppContext';
 
 const About: React.FC = () => {
+  const { enquiryCount } = useApp();
+
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      <Navbar cartCount={0} />
+      <Navbar enquiryCount={enquiryCount} />
       
       <main className="flex-grow pt-20">
         {/* Hero Section */}
@@ -45,12 +49,18 @@ const About: React.FC = () => {
                   institutions seeking professional uniform solutions that reflect their values and standards.
                 </p>
                 <div className="flex gap-4">
-                  <button className="bg-black text-white px-8 py-3 text-[11px] font-bold tracking-widest uppercase hover:bg-amber-600 transition-colors">
-                    OUR SERVICES
-                  </button>
-                  <button className="border border-black text-black px-8 py-3 text-[11px] font-bold tracking-widest uppercase hover:bg-black hover:text-white transition-all">
+                  <Link 
+                    to="/contact"
+                    className="bg-black text-white px-8 py-3 text-[11px] font-bold tracking-widest uppercase hover:bg-amber-600 transition-colors"
+                  >
+                    REQUEST QUOTE
+                  </Link>
+                  <Link 
+                    to="/contact"
+                    className="border border-black text-black px-8 py-3 text-[11px] font-bold tracking-widest uppercase hover:bg-black hover:text-white transition-all"
+                  >
                     CONTACT US
-                  </button>
+                  </Link>
                 </div>
               </div>
               <div className="relative">
@@ -173,12 +183,18 @@ const About: React.FC = () => {
               can provide the perfect professional solution for your institution.
             </p>
             <div className="flex gap-6 justify-center">
-              <button className="bg-white text-black px-10 py-4 text-[11px] font-bold tracking-widest uppercase hover:bg-amber-600 hover:text-white transition-all">
+              <Link 
+                to="/contact"
+                className="bg-white text-black px-10 py-4 text-[11px] font-bold tracking-widest uppercase hover:bg-amber-600 hover:text-white transition-all"
+              >
                 GET QUOTE
-              </button>
-              <button className="border border-white text-white px-10 py-4 text-[11px] font-bold tracking-widest uppercase hover:bg-white hover:text-black transition-all">
+              </Link>
+              <Link 
+                to="/catalog"
+                className="border border-white text-white px-10 py-4 text-[11px] font-bold tracking-widest uppercase hover:bg-white hover:text-black transition-all"
+              >
                 VIEW CATALOG
-              </button>
+              </Link>
             </div>
           </div>
         </section>

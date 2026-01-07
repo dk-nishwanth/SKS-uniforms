@@ -2,12 +2,54 @@ const twilio = require('twilio');
 
 class SMSService {
   constructor() {
-    this.client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
-    this.fromNumber = process.env.TWILIO_PHONE_NUMBER;
+    this.isConfigured = false;
+    
+    // Check if Twilio credentials are properly configured
+    if (process.env.TWILIO_ACCOUNT_SID && 
+        process.env.TWILIO_AUTH_TOKEN && 
+        process.env.TWILIO_PHONE_NUMBER &&
+        process.env.TWILIO_ACCOUNT_SID.startsWith('AC')) {
+      
+      try {
+        this.client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+        this.fromNumber = process.env.TWILIO_PHONE_NUMBER;
+        this.isConfigured = true;
+        console.log('📱 SMS service configured successfully');
+      } catch (error) {
+        console.warn('⚠️ SMS service configuration failed:', error.message);
+        this.isConfigured = false;
+      }
+    } else {
+      console.warn('⚠️ SMS service not configured - missing Twilio credentials');
+      console.warn('   Please set TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and TWILIO_PHONE_NUMBER in .env');
+    }
+    
     this.contactNumbers = [
       process.env.CONTACT_PHONE_1,
-      process.env.CONTACT_PHONE_2
+      process.env.CONTACT_PHONE_2,
+      process.env.CONTACT_PHONE_3
     ].filter(Boolean); // Remove any undefined numbers
+  }
+
+  async sendSMS(message, to) {
+    if (!this.isConfigured) {
+      console.log('📱 SMS not sent (service not configured):', { to, message: message.substring(0, 50) + '...' });
+      return { success: false, error: 'SMS service not configured' };
+    }
+
+    try {
+      const result = await this.client.messages.create({
+        body: message,
+        from: this.fromNumber,
+        to: to
+      });
+      
+      console.log(`📱 SMS sent successfully to ${to}:`, result.sid);
+      return { success: true, to, sid: result.sid };
+    } catch (error) {
+      console.error(`❌ Error sending SMS to ${to}:`, error.message);
+      return { success: false, to, error: error.message };
+    }
   }
 
   async sendContactNotification(formData) {
@@ -30,27 +72,43 @@ Reply to customer at: ${email}`;
     const results = [];
 
     for (const contactNumber of this.contactNumbers) {
-      try {
-        const result = await this.client.messages.create({
-          body: smsMessage,
-          from: this.fromNumber,
-          to: contactNumber
-        });
-        
-        console.log(`📱 SMS sent successfully to ${contactNumber}:`, result.sid);
-        results.push({
-          success: true,
-          to: contactNumber,
-          sid: result.sid
-        });
-      } catch (error) {
-        console.error(`❌ Error sending SMS to ${contactNumber}:`, error.message);
-        results.push({
-          success: false,
-          to: contactNumber,
-          error: error.message
-        });
-      }
+      const result = await this.sendSMS(smsMessage, contactNumber);
+      results.push(result);
+    }
+
+    return results;
+  }
+
+  async sendEnquiryNotification(contactInfo, enquiryItems, message) {
+    const { name, email, phone, company } = contactInfo;
+    
+    const itemsList = enquiryItems.slice(0, 3).map(item => 
+      `• ${item.name} ${item.selectedSize ? `(${item.selectedSize})` : ''} ${item.quantity ? `x${item.quantity}` : ''}`
+    ).join('\n');
+    
+    const moreItems = enquiryItems.length > 3 ? `\n...and ${enquiryItems.length - 3} more items` : '';
+    
+    const smsMessage = `🛍️ NEW ENQUIRY - SKS Uniforms
+
+👤 ${name}
+📧 ${email}
+${phone ? `📞 ${phone}` : ''}
+${company ? `🏢 ${company}` : ''}
+
+📋 Items (${enquiryItems.length}):
+${itemsList}${moreItems}
+
+💬 ${message ? message.substring(0, 50) + (message.length > 50 ? '...' : '') : 'No message'}
+
+⏰ ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}
+
+Action: Prepare quote and respond to customer`;
+
+    const results = [];
+
+    for (const contactNumber of this.contactNumbers) {
+      const result = await this.sendSMS(smsMessage, contactNumber);
+      results.push(result);
     }
 
     return results;
@@ -74,27 +132,8 @@ Urgent: Prepare quote for customer`;
     const results = [];
 
     for (const contactNumber of this.contactNumbers) {
-      try {
-        const result = await this.client.messages.create({
-          body: smsMessage,
-          from: this.fromNumber,
-          to: contactNumber
-        });
-        
-        console.log(`📱 Quote SMS sent successfully to ${contactNumber}:`, result.sid);
-        results.push({
-          success: true,
-          to: contactNumber,
-          sid: result.sid
-        });
-      } catch (error) {
-        console.error(`❌ Error sending quote SMS to ${contactNumber}:`, error.message);
-        results.push({
-          success: false,
-          to: contactNumber,
-          error: error.message
-        });
-      }
+      const result = await this.sendSMS(smsMessage, contactNumber);
+      results.push(result);
     }
 
     return results;
@@ -118,27 +157,8 @@ Action: Prepare samples for shipping`;
     const results = [];
 
     for (const contactNumber of this.contactNumbers) {
-      try {
-        const result = await this.client.messages.create({
-          body: smsMessage,
-          from: this.fromNumber,
-          to: contactNumber
-        });
-        
-        console.log(`📱 Sample request SMS sent successfully to ${contactNumber}:`, result.sid);
-        results.push({
-          success: true,
-          to: contactNumber,
-          sid: result.sid
-        });
-      } catch (error) {
-        console.error(`❌ Error sending sample request SMS to ${contactNumber}:`, error.message);
-        results.push({
-          success: false,
-          to: contactNumber,
-          error: error.message
-        });
-      }
+      const result = await this.sendSMS(smsMessage, contactNumber);
+      results.push(result);
     }
 
     return results;
@@ -162,27 +182,8 @@ Action: Schedule consultation call`;
     const results = [];
 
     for (const contactNumber of this.contactNumbers) {
-      try {
-        const result = await this.client.messages.create({
-          body: smsMessage,
-          from: this.fromNumber,
-          to: contactNumber
-        });
-        
-        console.log(`📱 Consultation SMS sent successfully to ${contactNumber}:`, result.sid);
-        results.push({
-          success: true,
-          to: contactNumber,
-          sid: result.sid
-        });
-      } catch (error) {
-        console.error(`❌ Error sending consultation SMS to ${contactNumber}:`, error.message);
-        results.push({
-          success: false,
-          to: contactNumber,
-          error: error.message
-        });
-      }
+      const result = await this.sendSMS(smsMessage, contactNumber);
+      results.push(result);
     }
 
     return results;
@@ -200,27 +201,8 @@ If you receive this, SMS service is working correctly! ✅`;
     const results = [];
 
     for (const contactNumber of this.contactNumbers) {
-      try {
-        const result = await this.client.messages.create({
-          body: testMessage,
-          from: this.fromNumber,
-          to: contactNumber
-        });
-        
-        console.log(`📱 Test SMS sent successfully to ${contactNumber}:`, result.sid);
-        results.push({
-          success: true,
-          to: contactNumber,
-          sid: result.sid
-        });
-      } catch (error) {
-        console.error(`❌ Error sending test SMS to ${contactNumber}:`, error.message);
-        results.push({
-          success: false,
-          to: contactNumber,
-          error: error.message
-        });
-      }
+      const result = await this.sendSMS(testMessage, contactNumber);
+      results.push(result);
     }
 
     return results;

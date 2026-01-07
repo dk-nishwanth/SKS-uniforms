@@ -1,75 +1,42 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { Product } from '../types';
-
-const HEALTHCARE_PRODUCTS: Product[] = [
-  {
-    id: 'h1',
-    name: 'MEDICAL SCRUBS - WHITE',
-    price: '₹1,800',
-    category: 'Healthcare',
-    image: '/images/Medical Uniform 1.png',
-    description: 'Comfortable and durable medical scrubs for healthcare professionals.',
-    isNew: true
-  },
-  {
-    id: 'h2',
-    name: 'HOSPITAL UNIFORM - WHITE',
-    price: '₹2,200',
-    category: 'Healthcare',
-    image: '/images/Hospital Uniform 1.png',
-    description: 'Classic hospital uniform with modern cut and professional finish.',
-    isNew: true
-  },
-  {
-    id: 'h3',
-    name: 'DOCTOR COAT - WHITE',
-    price: '₹2,800',
-    category: 'Healthcare',
-    image: '/images/Medical Uniform 1.png',
-    description: 'Professional doctor coat with multiple pockets and comfortable fit.',
-    isNew: false
-  },
-  {
-    id: 'h4',
-    name: 'NURSE UNIFORM - BLUE TRIM',
-    price: '₹2,000',
-    category: 'Healthcare',
-    image: '/images/Hospital Uniform 1.png',
-    description: 'Modern nurse uniform with blue trim and ergonomic design.',
-    isNew: false
-  },
-  {
-    id: 'h5',
-    name: 'SURGICAL SCRUBS - GREEN',
-    price: '₹2,100',
-    category: 'Healthcare',
-    image: '/images/Medical Uniform 1.png',
-    description: 'Sterile surgical scrubs for operating room professionals.',
-    isNew: true
-  },
-  {
-    id: 'h6',
-    name: 'LAB COAT - LONG SLEEVE',
-    price: '₹1,900',
-    category: 'Healthcare',
-    image: '/images/Hospital Uniform 1.png',
-    description: 'Laboratory coat with chemical-resistant fabric and secure closures.',
-    isNew: false
-  }
-];
+import { useApp, ALL_PRODUCTS } from '../contexts/AppContext';
+import { Heart, MessageCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Healthcare: React.FC = () => {
-  const [cartItems, setCartItems] = useState<Product[]>([]);
+  const { 
+    addToEnquiry, 
+    addToWishlist, 
+    removeFromWishlist, 
+    isInWishlist, 
+    setSelectedProduct,
+    enquiryCount 
+  } = useApp();
 
-  const addToCart = (product: Product) => {
-    setCartItems(prev => [...prev, product]);
+  // Filter products for Healthcare category
+  const healthcareProducts = ALL_PRODUCTS.filter(product => product.category === 'Healthcare');
+
+  const handleAddToEnquiry = (product: any) => {
+    addToEnquiry(product);
+  };
+
+  const handleWishlistToggle = (product: any) => {
+    if (isInWishlist(product.id)) {
+      removeFromWishlist(product.id);
+    } else {
+      addToWishlist(product);
+    }
+  };
+
+  const handleViewDetails = (product: any) => {
+    setSelectedProduct(product);
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      <Navbar cartCount={cartItems.length} />
+      <Navbar enquiryCount={enquiryCount} />
       
       <main className="flex-grow pt-20">
         {/* Hero Section */}
@@ -92,9 +59,12 @@ const Healthcare: React.FC = () => {
             <p className="text-xl max-w-2xl mx-auto leading-relaxed mb-8">
               Professional medical uniforms for hospitals, clinics, and healthcare facilities
             </p>
-            <button className="bg-amber-600 text-white px-10 py-4 text-[11px] font-bold tracking-widest uppercase hover:bg-black transition-colors">
+            <Link 
+              to="/catalog?filter=healthcare"
+              className="bg-amber-600 text-white px-10 py-4 text-[11px] font-bold tracking-widest uppercase hover:bg-black transition-colors inline-block"
+            >
               EXPLORE COLLECTION
-            </button>
+            </Link>
           </div>
         </section>
 
@@ -133,34 +103,53 @@ const Healthcare: React.FC = () => {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {HEALTHCARE_PRODUCTS.map((product) => (
+              {healthcareProducts.map((product) => (
                 <div key={product.id} className="group cursor-pointer border border-black hover:shadow-lg transition-all">
-                  <div className="aspect-[3/4] overflow-hidden">
+                  <div className="relative aspect-[3/4] overflow-hidden">
                     <img 
                       src={product.image} 
                       alt={product.name}
-                      className="w-full h-full object-cover grayscale group-hover:scale-105 transition-transform duration-700"
+                      className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                      onClick={() => handleViewDetails(product)}
                     />
-                  </div>
-                  <div className="p-6">
                     {product.isNew && (
-                      <div className="bg-amber-600 text-white text-[9px] font-bold px-2 py-1 inline-block mb-3 tracking-widest">
+                      <div className="absolute top-4 left-4 bg-amber-600 text-white text-[9px] font-bold px-2 py-1 tracking-widest">
                         NEW
                       </div>
                     )}
-                    <h3 className="font-heading text-xl mb-2 group-hover:text-amber-600 transition-colors">
+                    <button
+                      onClick={() => handleWishlistToggle(product)}
+                      className="absolute top-4 right-4 p-2 bg-white/90 rounded-full hover:bg-white transition-colors"
+                    >
+                      <Heart size={16} className={isInWishlist(product.id) ? 'fill-red-500 text-red-500' : ''} />
+                    </button>
+                    
+                    {/* Hover overlay */}
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                      <button 
+                        onClick={() => handleViewDetails(product)}
+                        className="bg-white text-black px-6 py-2 text-[10px] font-bold tracking-widest uppercase border border-black transform translate-y-12 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 hover:bg-black hover:text-white"
+                      >
+                        VIEW DETAILS
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div className="p-6">
+                    <h3 className="font-heading text-lg mb-2 group-hover:text-amber-600 transition-colors">
                       {product.name}
                     </h3>
-                    <p className="text-zinc-600 text-sm mb-4 leading-relaxed">
+                    <p className="text-zinc-600 text-sm mb-4 leading-relaxed line-clamp-2">
                       {product.description}
                     </p>
                     <div className="flex justify-between items-center">
-                      <span className="text-2xl font-bold">{product.price}</span>
+                      <span className="text-lg font-bold text-amber-600">REQUEST QUOTE</span>
                       <button 
-                        onClick={() => addToCart(product)}
-                        className="bg-black text-white px-6 py-2 text-[10px] font-bold tracking-widest uppercase hover:bg-amber-600 transition-colors"
+                        onClick={() => handleAddToEnquiry(product)}
+                        className="flex items-center gap-2 bg-black text-white px-4 py-2 text-[9px] font-bold tracking-widest uppercase hover:bg-amber-600 transition-colors"
                       >
-                        ADD TO CART
+                        <MessageCircle size={12} />
+                        ADD TO ENQUIRY
                       </button>
                     </div>
                   </div>
@@ -241,9 +230,12 @@ const Healthcare: React.FC = () => {
                   Long-term partnerships with hospitals and clinics for consistent 
                   uniform supply and maintenance programs.
                 </p>
-                <button className="text-[11px] font-bold tracking-widest uppercase border-b border-black pb-1 hover:text-amber-600 hover:border-amber-600 transition-all">
+                <Link 
+                  to="/contact"
+                  className="text-[11px] font-bold tracking-widest uppercase border-b border-black pb-1 hover:text-amber-600 hover:border-amber-600 transition-all"
+                >
                   PARTNER WITH US →
-                </button>
+                </Link>
               </div>
               
               <div className="bg-white p-8 border border-black">
@@ -252,9 +244,12 @@ const Healthcare: React.FC = () => {
                   Hospital logos, department names, and individual name tags 
                   embroidered with medical-grade threads.
                 </p>
-                <button className="text-[11px] font-bold tracking-widest uppercase border-b border-black pb-1 hover:text-amber-600 hover:border-amber-600 transition-all">
+                <Link 
+                  to="/contact"
+                  className="text-[11px] font-bold tracking-widest uppercase border-b border-black pb-1 hover:text-amber-600 hover:border-amber-600 transition-all"
+                >
                   CUSTOMIZE NOW →
-                </button>
+                </Link>
               </div>
               
               <div className="bg-white p-8 border border-black">
@@ -263,9 +258,12 @@ const Healthcare: React.FC = () => {
                   Emergency uniform supply and rapid delivery services for 
                   urgent healthcare facility requirements.
                 </p>
-                <button className="text-[11px] font-bold tracking-widest uppercase border-b border-black pb-1 hover:text-amber-600 hover:border-amber-600 transition-all">
+                <Link 
+                  to="/contact"
+                  className="text-[11px] font-bold tracking-widest uppercase border-b border-black pb-1 hover:text-amber-600 hover:border-amber-600 transition-all"
+                >
                   URGENT ORDER →
-                </button>
+                </Link>
               </div>
             </div>
           </div>
@@ -279,12 +277,18 @@ const Healthcare: React.FC = () => {
               Professional medical uniforms that meet the highest standards of quality and hygiene
             </p>
             <div className="flex gap-6 justify-center">
-              <button className="bg-white text-black px-10 py-4 text-[11px] font-bold tracking-widest uppercase hover:bg-amber-600 hover:text-white transition-all">
+              <Link 
+                to="/contact"
+                className="bg-white text-black px-10 py-4 text-[11px] font-bold tracking-widest uppercase hover:bg-amber-600 hover:text-white transition-all"
+              >
                 REQUEST QUOTE
-              </button>
-              <button className="border border-white text-white px-10 py-4 text-[11px] font-bold tracking-widest uppercase hover:bg-white hover:text-black transition-all">
+              </Link>
+              <Link 
+                to="/catalog"
+                className="border border-white text-white px-10 py-4 text-[11px] font-bold tracking-widest uppercase hover:bg-white hover:text-black transition-all"
+              >
                 MEDICAL CATALOG
-              </button>
+              </Link>
             </div>
           </div>
         </section>

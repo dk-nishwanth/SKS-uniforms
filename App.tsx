@@ -4,20 +4,20 @@ import Hero from './components/Hero';
 import ProductCarousel from './components/ProductGrid';
 import InfoGrid from './components/InfoGrid';
 import Footer from './components/Footer';
-import CartDrawer from './components/CartDrawer';
+import EnquiryDrawer from './components/EnquiryDrawer';
 import ProductModal from './components/ProductModal';
 import { useApp, ALL_PRODUCTS } from './contexts/AppContext';
 import { Link } from 'react-router-dom';
 
 const App: React.FC = () => {
-  const { cartCount } = useApp();
+  const { enquiryCount } = useApp();
 
   // Get first 8 products for the carousel
   const featuredProducts = ALL_PRODUCTS.slice(0, 8);
 
   return (
     <div className="min-h-screen flex flex-col bg-white overflow-x-hidden">
-      <Navbar cartCount={cartCount} />
+      <Navbar enquiryCount={enquiryCount} />
       
       <main className="flex-grow">
         <Hero />
@@ -131,7 +131,7 @@ const App: React.FC = () => {
       <Footer />
 
       {/* Overlays */}
-      <CartDrawer />
+      <EnquiryDrawer />
       <ProductModal />
 
       <style>{`

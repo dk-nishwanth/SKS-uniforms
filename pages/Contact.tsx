@@ -5,7 +5,7 @@ import { useApp } from '../contexts/AppContext';
 import { MapPin, Phone, Mail, Clock, Send } from 'lucide-react';
 
 const Contact: React.FC = () => {
-  const { cartCount } = useApp();
+  const { enquiryCount } = useApp();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -75,7 +75,7 @@ const Contact: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      <Navbar cartCount={cartCount} />
+      <Navbar enquiryCount={enquiryCount} />
       
       <main className="flex-grow pt-20">
         {/* Hero Section */}

@@ -2,21 +2,45 @@ const nodemailer = require('nodemailer');
 
 class EmailService {
   constructor() {
-    this.transporter = nodemailer.createTransporter({
-      host: process.env.EMAIL_HOST,
-      port: process.env.EMAIL_PORT,
-      secure: false, // true for 465, false for other ports
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-      },
-      tls: {
-        rejectUnauthorized: false
+    this.isConfigured = false;
+    
+    // Check if email credentials are properly configured
+    if (process.env.EMAIL_HOST && 
+        process.env.EMAIL_USER && 
+        process.env.EMAIL_PASS && 
+        process.env.EMAIL_FROM) {
+      
+      try {
+        this.transporter = nodemailer.createTransport({
+          host: process.env.EMAIL_HOST,
+          port: process.env.EMAIL_PORT,
+          secure: false, // true for 465, false for other ports
+          auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS
+          },
+          tls: {
+            rejectUnauthorized: false
+          }
+        });
+        this.isConfigured = true;
+        console.log('📧 Email service configured successfully');
+      } catch (error) {
+        console.warn('⚠️ Email service configuration failed:', error.message);
+        this.isConfigured = false;
       }
-    });
+    } else {
+      console.warn('⚠️ Email service not configured - missing email credentials');
+      console.warn('   Please set EMAIL_HOST, EMAIL_USER, EMAIL_PASS, and EMAIL_FROM in .env');
+    }
   }
 
   async sendContactFormEmail(formData) {
+    if (!this.isConfigured) {
+      console.log('📧 Email not sent (service not configured):', formData.name, formData.email);
+      return { success: false, error: 'Email service not configured' };
+    }
+
     const { name, email, phone, organization, category, message, inquiryType } = formData;
     
     const subject = `New ${inquiryType} from SKS Uniforms Website - ${name}`;
@@ -116,6 +140,11 @@ class EmailService {
   }
 
   async sendAutoReplyEmail(customerEmail, customerName, inquiryType) {
+    if (!this.isConfigured) {
+      console.log('📧 Auto-reply email not sent (service not configured):', customerName, customerEmail);
+      return { success: false, error: 'Email service not configured' };
+    }
+
     const subject = `Thank you for contacting SKS Uniforms - ${customerName}`;
     
     const htmlContent = `
@@ -189,6 +218,11 @@ class EmailService {
   }
 
   async sendNewsletterConfirmation(email, categories) {
+    if (!this.isConfigured) {
+      console.log('📧 Newsletter confirmation email not sent (service not configured):', email);
+      return { success: false, error: 'Email service not configured' };
+    }
+
     const subject = 'Welcome to SKS Uniforms Newsletter!';
     
     const htmlContent = `

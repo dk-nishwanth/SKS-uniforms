@@ -1,20 +1,20 @@
 import React from 'react';
-import { Heart, ShoppingBag, ArrowLeft } from 'lucide-react';
+import { Heart, MessageCircle, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useApp } from '../contexts/AppContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
 const Wishlist: React.FC = () => {
-  const { wishlistItems, removeFromWishlist, addToCart, cartCount } = useApp();
+  const { wishlistItems, removeFromWishlist, addToEnquiry, enquiryCount } = useApp();
 
-  const handleAddToCart = (product: any) => {
-    addToCart(product);
+  const handleAddToEnquiry = (product: any) => {
+    addToEnquiry(product);
   };
 
   return (
     <div className="min-h-screen bg-white">
-      <Navbar cartCount={cartCount} />
+      <Navbar enquiryCount={enquiryCount} />
       
       <div className="pt-20">
         {/* Header */}
@@ -90,7 +90,7 @@ const Wishlist: React.FC = () => {
                         {product.description}
                       </p>
                       <div className="flex items-center justify-between">
-                        <span className="text-lg font-bold">{product.price}</span>
+                        <span className="text-lg font-bold">REQUEST QUOTE</span>
                         <span className="text-xs font-bold text-zinc-400 tracking-widest uppercase">
                           {product.category}
                         </span>
@@ -99,11 +99,11 @@ const Wishlist: React.FC = () => {
                     
                     <div className="flex gap-3">
                       <button 
-                        onClick={() => handleAddToCart(product)}
+                        onClick={() => handleAddToEnquiry(product)}
                         className="flex-1 flex items-center justify-center gap-2 bg-black text-white py-3 text-xs font-bold tracking-widest uppercase hover:bg-zinc-800 transition-colors"
                       >
-                        <ShoppingBag size={14} />
-                        ADD TO CART
+                        <MessageCircle size={14} />
+                        ADD TO ENQUIRY
                       </button>
                       <button 
                         onClick={() => removeFromWishlist(product.id)}

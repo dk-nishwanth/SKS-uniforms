@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ShoppingBag, Search, Menu, X, User, Heart } from 'lucide-react';
+import { MessageCircle, Search, Menu, X, User, Heart } from 'lucide-react';
 import { useApp } from '../contexts/AppContext';
 import SearchModal from './SearchModal';
 import ProfileModal from './ProfileModal';
 import '../navbar-mobile-fix.css';
 
 interface NavbarProps {
-  cartCount?: number;
+  enquiryCount?: number;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ cartCount: propCartCount }) => {
+const Navbar: React.FC<NavbarProps> = ({ enquiryCount: propEnquiryCount }) => {
   const { 
-    cartCount, 
-    setIsCartOpen, 
+    enquiryCount, 
+    setIsEnquiryOpen, 
     setIsSearchOpen, 
     wishlistItems,
     user
@@ -25,7 +25,7 @@ const Navbar: React.FC<NavbarProps> = ({ cartCount: propCartCount }) => {
   const location = useLocation();
   const isHomePage = location.pathname === '/';
 
-  const finalCartCount = propCartCount !== undefined ? propCartCount : cartCount;
+  const finalEnquiryCount = propEnquiryCount !== undefined ? propEnquiryCount : enquiryCount;
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -148,15 +148,15 @@ const Navbar: React.FC<NavbarProps> = ({ cartCount: propCartCount }) => {
             </Link>
             
             <button 
-              onClick={() => setIsCartOpen(true)}
+              onClick={() => setIsEnquiryOpen(true)}
               className="p-2 hover:opacity-50 transition-opacity relative"
-              aria-label="Shopping Cart"
+              aria-label="Enquiry List"
               style={textShadowStyle}
             >
-              <ShoppingBag size={20} />
-              {finalCartCount > 0 && (
+              <MessageCircle size={20} />
+              {finalEnquiryCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-black text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
-                  {finalCartCount}
+                  {finalEnquiryCount}
                 </span>
               )}
             </button>

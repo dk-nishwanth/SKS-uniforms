@@ -2,7 +2,6 @@
 export interface Product {
   id: string;
   name: string;
-  price: string;
   category: string;
   subcategory?: string;
   image: string;
@@ -21,8 +20,9 @@ export interface Collection {
   products: Product[];
 }
 
-export interface CartItem extends Product {
-  quantity: number;
+export interface EnquiryItem extends Product {
   selectedSize?: string;
   selectedColor?: string;
+  quantity?: number;
+  notes?: string;
 }

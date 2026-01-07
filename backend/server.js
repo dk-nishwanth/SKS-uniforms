@@ -85,7 +85,7 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 SKS Uniforms API server running on port ${PORT}`);
   console.log(`📧 Email service configured for: ${process.env.EMAIL_FROM}`);
-  console.log(`📱 SMS service configured for: ${process.env.CONTACT_PHONE_1}, ${process.env.CONTACT_PHONE_2}`);
+  console.log(`📱 SMS service configured for: ${process.env.CONTACT_PHONE_1}, ${process.env.CONTACT_PHONE_2}, ${process.env.CONTACT_PHONE_3}`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV}`);
 });
 

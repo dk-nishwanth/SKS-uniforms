@@ -1,37 +1,38 @@
 import React, { useState } from 'react';
-import { ArrowLeft, CreditCard, Truck, Shield, Check } from 'lucide-react';
+import { ArrowLeft, MessageCircle, Send, Shield, Check } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useApp } from '../contexts/AppContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
-const Checkout: React.FC = () => {
-  const { cartItems, cartTotal, clearCart, cartCount } = useApp();
+const Enquiry: React.FC = () => {
+  const { enquiryItems, clearEnquiry, enquiryCount, submitEnquiry } = useApp();
   const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState(false);
-  const [orderComplete, setOrderComplete] = useState(false);
+  const [enquiryComplete, setEnquiryComplete] = useState(false);
   const [formData, setFormData] = useState({
-    // Shipping Information
+    // Contact Information
     firstName: '',
     lastName: '',
     email: '',
     phone: '',
+    company: '',
+    designation: '',
+    
+    // Address Information
     address: '',
     city: '',
     state: '',
     pincode: '',
     
-    // Payment Information
-    cardNumber: '',
-    expiryDate: '',
-    cvv: '',
-    cardName: '',
-    
-    // Order Notes
-    notes: ''
+    // Enquiry Details
+    enquiryType: 'bulk_order',
+    timeline: '',
+    budget: '',
+    message: ''
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData(prev => ({
       ...prev,
       [e.target.name]: e.target.value
@@ -42,27 +43,30 @@ const Checkout: React.FC = () => {
     e.preventDefault();
     setIsProcessing(true);
 
-    // Simulate payment processing
-    await new Promise(resolve => setTimeout(resolve, 3000));
-
-    setOrderComplete(true);
-    clearCart();
-    setIsProcessing(false);
+    try {
+      await submitEnquiry(formData, formData.message);
+      setEnquiryComplete(true);
+      clearEnquiry();
+      setIsProcessing(false);
+    } catch (error) {
+      alert('Failed to submit enquiry. Please try again.');
+      setIsProcessing(false);
+    }
   };
 
-  if (cartItems.length === 0 && !orderComplete) {
+  if (enquiryItems.length === 0 && !enquiryComplete) {
     return (
       <div className="min-h-screen bg-white">
-        <Navbar cartCount={cartCount} />
+        <Navbar enquiryCount={enquiryCount} />
         <div className="pt-20 flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
-            <h1 className="font-heading text-3xl tracking-tight mb-4">Your cart is empty</h1>
-            <p className="text-zinc-600 mb-8">Add some items to your cart before checkout.</p>
+            <h1 className="font-heading text-3xl tracking-tight mb-4">Your enquiry list is empty</h1>
+            <p className="text-zinc-600 mb-8">Add some items to your enquiry list before submitting.</p>
             <Link 
               to="/catalog"
               className="inline-block bg-black text-white px-8 py-3 text-sm font-bold tracking-widest uppercase hover:bg-zinc-800 transition-colors"
             >
-              CONTINUE SHOPPING
+              BROWSE PRODUCTS
             </Link>
           </div>
         </div>
@@ -71,25 +75,25 @@ const Checkout: React.FC = () => {
     );
   }
 
-  if (orderComplete) {
+  if (enquiryComplete) {
     return (
       <div className="min-h-screen bg-white">
-        <Navbar cartCount={cartCount} />
+        <Navbar enquiryCount={enquiryCount} />
         <div className="pt-20 flex items-center justify-center min-h-[60vh]">
           <div className="text-center max-w-md">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <Check size={32} className="text-green-600" />
             </div>
-            <h1 className="font-heading text-3xl tracking-tight mb-4">Order Confirmed!</h1>
+            <h1 className="font-heading text-3xl tracking-tight mb-4">Enquiry Submitted!</h1>
             <p className="text-zinc-600 mb-8">
-              Thank you for your order. We'll send you a confirmation email shortly with tracking details.
+              Thank you for your enquiry. Our team will review your requirements and contact you within 24 hours with a detailed quote and timeline.
             </p>
             <div className="space-y-3">
               <Link 
                 to="/catalog"
                 className="block bg-black text-white px-8 py-3 text-sm font-bold tracking-widest uppercase hover:bg-zinc-800 transition-colors"
               >
-                CONTINUE SHOPPING
+                CONTINUE BROWSING
               </Link>
               <Link 
                 to="/"
@@ -105,13 +109,9 @@ const Checkout: React.FC = () => {
     );
   }
 
-  const shippingCost = cartTotal > 5000 ? 0 : 200;
-  const tax = cartTotal * 0.18; // 18% GST
-  const finalTotal = cartTotal + shippingCost + tax;
-
   return (
     <div className="min-h-screen bg-white">
-      <Navbar cartCount={cartCount} />
+      <Navbar enquiryCount={enquiryCount} />
       
       <div className="pt-20">
         {/* Header */}
@@ -123,10 +123,11 @@ const Checkout: React.FC = () => {
                 className="flex items-center gap-2 text-sm hover:underline"
               >
                 <ArrowLeft size={16} />
-                Back to Cart
+                Back to Catalog
               </Link>
             </div>
-            <h1 className="font-heading text-4xl tracking-tight">CHECKOUT</h1>
+            <h1 className="font-heading text-4xl tracking-tight">SUBMIT ENQUIRY</h1>
+            <p className="text-zinc-600 mt-2">Get a customized quote for your uniform requirements</p>
           </div>
         </div>
 
@@ -134,11 +135,11 @@ const Checkout: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Left Column - Forms */}
             <div className="lg:col-span-2 space-y-8">
-              {/* Shipping Information */}
+              {/* Contact Information */}
               <div className="border border-black p-6">
                 <h2 className="font-heading text-2xl tracking-tight mb-6 flex items-center gap-3">
-                  <Truck size={24} />
-                  SHIPPING INFORMATION
+                  <MessageCircle size={24} />
+                  CONTACT INFORMATION
                 </h2>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -198,6 +199,40 @@ const Checkout: React.FC = () => {
                     />
                   </div>
                   
+                  <div>
+                    <label className="block text-xs font-bold tracking-widest uppercase mb-2">
+                      Company/Institution *
+                    </label>
+                    <input
+                      type="text"
+                      name="company"
+                      value={formData.company}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border border-black text-sm focus:outline-none focus:ring-2 focus:ring-black focus:ring-inset"
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-xs font-bold tracking-widest uppercase mb-2">
+                      Designation
+                    </label>
+                    <input
+                      type="text"
+                      name="designation"
+                      value={formData.designation}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border border-black text-sm focus:outline-none focus:ring-2 focus:ring-black focus:ring-inset"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Address Information */}
+              <div className="border border-black p-6">
+                <h2 className="font-heading text-2xl tracking-tight mb-6">ADDRESS INFORMATION</h2>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="md:col-span-2">
                     <label className="block text-xs font-bold tracking-widest uppercase mb-2">
                       Address *
@@ -256,97 +291,82 @@ const Checkout: React.FC = () => {
                 </div>
               </div>
 
-              {/* Payment Information */}
+              {/* Enquiry Details */}
               <div className="border border-black p-6">
-                <h2 className="font-heading text-2xl tracking-tight mb-6 flex items-center gap-3">
-                  <CreditCard size={24} />
-                  PAYMENT INFORMATION
-                </h2>
+                <h2 className="font-heading text-2xl tracking-tight mb-6">ENQUIRY DETAILS</h2>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="md:col-span-2">
+                  <div>
                     <label className="block text-xs font-bold tracking-widest uppercase mb-2">
-                      Card Number *
+                      Enquiry Type *
+                    </label>
+                    <select
+                      name="enquiryType"
+                      value={formData.enquiryType}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border border-black text-sm focus:outline-none focus:ring-2 focus:ring-black focus:ring-inset"
+                      required
+                    >
+                      <option value="bulk_order">Bulk Order</option>
+                      <option value="sample_request">Sample Request</option>
+                      <option value="custom_design">Custom Design</option>
+                      <option value="quote_request">Quote Request</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-xs font-bold tracking-widest uppercase mb-2">
+                      Required Timeline
                     </label>
                     <input
                       type="text"
-                      name="cardNumber"
-                      value={formData.cardNumber}
+                      name="timeline"
+                      value={formData.timeline}
                       onChange={handleInputChange}
-                      placeholder="1234 5678 9012 3456"
+                      placeholder="e.g., 2-3 weeks, ASAP, etc."
                       className="w-full px-4 py-3 border border-black text-sm focus:outline-none focus:ring-2 focus:ring-black focus:ring-inset"
-                      required
                     />
                   </div>
                   
                   <div>
                     <label className="block text-xs font-bold tracking-widest uppercase mb-2">
-                      Expiry Date *
+                      Budget Range
                     </label>
                     <input
                       type="text"
-                      name="expiryDate"
-                      value={formData.expiryDate}
+                      name="budget"
+                      value={formData.budget}
                       onChange={handleInputChange}
-                      placeholder="MM/YY"
+                      placeholder="e.g., ₹50,000 - ₹1,00,000"
                       className="w-full px-4 py-3 border border-black text-sm focus:outline-none focus:ring-2 focus:ring-black focus:ring-inset"
-                      required
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-xs font-bold tracking-widest uppercase mb-2">
-                      CVV *
-                    </label>
-                    <input
-                      type="text"
-                      name="cvv"
-                      value={formData.cvv}
-                      onChange={handleInputChange}
-                      placeholder="123"
-                      className="w-full px-4 py-3 border border-black text-sm focus:outline-none focus:ring-2 focus:ring-black focus:ring-inset"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="md:col-span-2">
-                    <label className="block text-xs font-bold tracking-widest uppercase mb-2">
-                      Cardholder Name *
-                    </label>
-                    <input
-                      type="text"
-                      name="cardName"
-                      value={formData.cardName}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-black text-sm focus:outline-none focus:ring-2 focus:ring-black focus:ring-inset"
-                      required
                     />
                   </div>
                 </div>
-              </div>
-
-              {/* Order Notes */}
-              <div className="border border-black p-6">
-                <h2 className="font-heading text-2xl tracking-tight mb-6">ORDER NOTES</h2>
-                <textarea
-                  name="notes"
-                  value={formData.notes}
-                  onChange={handleInputChange}
-                  placeholder="Special instructions for your order (optional)"
-                  rows={4}
-                  className="w-full px-4 py-3 border border-black text-sm focus:outline-none focus:ring-2 focus:ring-black focus:ring-inset resize-none"
-                />
+                
+                <div className="mt-4">
+                  <label className="block text-xs font-bold tracking-widest uppercase mb-2">
+                    Additional Requirements
+                  </label>
+                  <textarea
+                    name="message"
+                    value={formData.message}
+                    onChange={handleInputChange}
+                    placeholder="Please provide details about quantities, customizations, embroidery requirements, special instructions, etc."
+                    rows={6}
+                    className="w-full px-4 py-3 border border-black text-sm focus:outline-none focus:ring-2 focus:ring-black focus:ring-inset resize-none"
+                  />
+                </div>
               </div>
             </div>
 
-            {/* Right Column - Order Summary */}
+            {/* Right Column - Enquiry Summary */}
             <div className="lg:col-span-1">
               <div className="border border-black p-6 sticky top-24">
-                <h2 className="font-heading text-2xl tracking-tight mb-6">ORDER SUMMARY</h2>
+                <h2 className="font-heading text-2xl tracking-tight mb-6">ENQUIRY SUMMARY</h2>
                 
                 <div className="space-y-4 mb-6">
-                  {cartItems.map((item) => (
-                    <div key={`${item.id}-${item.size}`} className="flex gap-4">
+                  {enquiryItems.map((item) => (
+                    <div key={`${item.id}-${item.selectedSize}`} className="flex gap-4">
                       <img 
                         src={item.image} 
                         alt={item.name}
@@ -354,11 +374,15 @@ const Checkout: React.FC = () => {
                       />
                       <div className="flex-grow">
                         <h3 className="text-sm font-medium">{item.name}</h3>
-                        {item.size && (
-                          <p className="text-xs text-zinc-500">Size: {item.size}</p>
+                        {item.selectedSize && (
+                          <p className="text-xs text-zinc-500">Size: {item.selectedSize}</p>
                         )}
-                        <p className="text-xs text-zinc-500">Qty: {item.quantity}</p>
-                        <p className="text-sm font-bold">{item.price}</p>
+                        {item.quantity && (
+                          <p className="text-xs text-zinc-500">Qty: {item.quantity}</p>
+                        )}
+                        {item.notes && (
+                          <p className="text-xs text-zinc-600 italic">"{item.notes}"</p>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -366,20 +390,12 @@ const Checkout: React.FC = () => {
 
                 <div className="border-t border-zinc-200 pt-4 space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span>Subtotal:</span>
-                    <span>₹{cartTotal.toLocaleString()}</span>
+                    <span>Total Items:</span>
+                    <span>{enquiryCount}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span>Shipping:</span>
-                    <span>{shippingCost === 0 ? 'FREE' : `₹${shippingCost}`}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Tax (GST 18%):</span>
-                    <span>₹{tax.toLocaleString()}</span>
-                  </div>
-                  <div className="border-t border-zinc-200 pt-2 flex justify-between font-bold">
-                    <span>Total:</span>
-                    <span>₹{finalTotal.toLocaleString()}</span>
+                    <span>Enquiry Type:</span>
+                    <span className="capitalize">{formData.enquiryType.replace('_', ' ')}</span>
                   </div>
                 </div>
 
@@ -391,19 +407,19 @@ const Checkout: React.FC = () => {
                   {isProcessing ? (
                     <>
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      PROCESSING...
+                      SUBMITTING...
                     </>
                   ) : (
                     <>
-                      <Shield size={16} />
-                      PLACE ORDER
+                      <Send size={16} />
+                      SUBMIT ENQUIRY
                     </>
                   )}
                 </button>
 
                 <div className="mt-4 text-xs text-zinc-500 text-center">
                   <Shield size={12} className="inline mr-1" />
-                  Secure checkout powered by SSL encryption
+                  Your information is secure and will only be used to process your enquiry
                 </div>
               </div>
             </div>
@@ -416,4 +432,4 @@ const Checkout: React.FC = () => {
   );
 };
 
-export default Checkout;
+export default Enquiry;

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Product } from '../types';
-import { Heart, Star, ShoppingBag } from 'lucide-react';
+import { Heart, Star, MessageCircle } from 'lucide-react';
 import { useApp, ALL_PRODUCTS } from '../contexts/AppContext';
 import { Link } from 'react-router-dom';
 
@@ -9,11 +9,11 @@ interface ProductGridProps {
 }
 
 const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
-  const { addToCart, addToWishlist, removeFromWishlist, isInWishlist, setSelectedProduct } = useApp();
+  const { addToEnquiry, addToWishlist, removeFromWishlist, isInWishlist, setSelectedProduct } = useApp();
   
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleAddToEnquiry = (e: React.MouseEvent) => {
     e.stopPropagation();
-    addToCart(product);
+    addToEnquiry(product);
   };
 
   const handleWishlistToggle = (e: React.MouseEvent) => {
@@ -67,15 +67,15 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
         </div>
         <div className="mt-auto flex justify-between items-center">
             <div className="flex flex-col">
-                <span className="text-[14px] font-bold">{product.price}</span>
-                <span className="text-[9px] font-bold text-zinc-400 tracking-widest uppercase">FREE SHIPPING</span>
+                <span className="text-[14px] font-bold text-amber-600">REQUEST QUOTE</span>
+                <span className="text-[9px] font-bold text-zinc-400 tracking-widest uppercase">BULK PRICING</span>
             </div>
             <button 
-                onClick={handleAddToCart}
+                onClick={handleAddToEnquiry}
                 className="flex items-center gap-2 text-[11px] font-bold tracking-widest uppercase group/add"
             >
-                <span className="underline underline-offset-4 group-hover/add:text-zinc-500 transition-colors">+ ADD</span>
-                <ShoppingBag size={14} className="opacity-0 group-hover/add:opacity-100 transition-opacity" />
+                <span className="underline underline-offset-4 group-hover/add:text-zinc-500 transition-colors">+ ENQUIRE</span>
+                <MessageCircle size={14} className="opacity-0 group-hover/add:opacity-100 transition-opacity" />
             </button>
         </div>
       </div>

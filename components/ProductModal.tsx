@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Heart, Shield, RefreshCw, Plus, Minus } from 'lucide-react';
+import { X, Heart, Shield, RefreshCw, Plus, Minus, MessageCircle } from 'lucide-react';
 import { Product } from '../types';
 import { useApp } from '../contexts/AppContext';
 
@@ -7,7 +7,7 @@ const ProductModal: React.FC = () => {
   const { 
     selectedProduct: product, 
     setSelectedProduct, 
-    addToCart, 
+    addToEnquiry, 
     addToWishlist, 
     removeFromWishlist, 
     isInWishlist 
@@ -15,11 +15,12 @@ const ProductModal: React.FC = () => {
   
   const [selectedSize, setSelectedSize] = useState('M');
   const [quantity, setQuantity] = useState(1);
+  const [notes, setNotes] = useState('');
 
   if (!product) return null;
 
-  const handleAddToCart = () => {
-    addToCart(product, selectedSize);
+  const handleAddToEnquiry = () => {
+    addToEnquiry(product, selectedSize, quantity, notes);
     setSelectedProduct(null);
   };
 
@@ -35,6 +36,7 @@ const ProductModal: React.FC = () => {
     setSelectedProduct(null);
     setSelectedSize('M');
     setQuantity(1);
+    setNotes('');
   };
 
   return (
@@ -53,7 +55,7 @@ const ProductModal: React.FC = () => {
             <div>
               <div className="text-[10px] font-bold tracking-[0.4em] text-amber-600 mb-2 uppercase">Provision No. {product.id}</div>
               <h2 className="font-heading text-5xl tracking-tight leading-none mb-4">{product.name}</h2>
-              <div className="text-2xl font-medium">{product.price}</div>
+              <div className="text-lg font-medium text-amber-600">Request Quote for Pricing</div>
             </div>
             <button onClick={handleClose} className="p-2 border border-black hover:bg-black hover:text-white transition-all">
                 <X size={20} />
@@ -87,7 +89,7 @@ const ProductModal: React.FC = () => {
 
             {/* Quantity Selection */}
             <div>
-              <h3 className="text-xs font-bold tracking-widest uppercase mb-4">Quantity</h3>
+              <h3 className="text-xs font-bold tracking-widest uppercase mb-4">Estimated Quantity</h3>
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -105,6 +107,18 @@ const ProductModal: React.FC = () => {
               </div>
             </div>
 
+            {/* Special Requirements */}
+            <div>
+              <h3 className="text-xs font-bold tracking-widest uppercase mb-4">Special Requirements</h3>
+              <textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Any customization, embroidery, or special requirements..."
+                rows={3}
+                className="w-full px-4 py-3 border border-black text-sm focus:outline-none focus:ring-2 focus:ring-black focus:ring-inset resize-none"
+              />
+            </div>
+
             {/* Features */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
               <div className="flex items-center gap-2">
@@ -113,11 +127,11 @@ const ProductModal: React.FC = () => {
               </div>
               <div className="flex items-center gap-2">
                 <RefreshCw size={16} />
-                <span>Easy Returns</span>
+                <span>Custom Sizing</span>
               </div>
               <div className="flex items-center gap-2">
                 <Heart size={16} />
-                <span>Lifetime Support</span>
+                <span>Bulk Discounts</span>
               </div>
             </div>
           </div>
@@ -125,10 +139,11 @@ const ProductModal: React.FC = () => {
           {/* Actions */}
           <div className="flex gap-4 mt-8">
             <button
-              onClick={handleAddToCart}
-              className="flex-1 bg-black text-white py-4 text-sm font-bold tracking-widest uppercase hover:bg-zinc-800 transition-colors"
+              onClick={handleAddToEnquiry}
+              className="flex-1 bg-black text-white py-4 text-sm font-bold tracking-widest uppercase hover:bg-zinc-800 transition-colors flex items-center justify-center gap-2"
             >
-              ADD TO PROVISIONS
+              <MessageCircle size={20} />
+              ADD TO ENQUIRY
             </button>
             <button
               onClick={handleWishlistToggle}

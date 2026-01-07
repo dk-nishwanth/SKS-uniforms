@@ -2,11 +2,14 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import { useApp } from '../contexts/AppContext';
 
 const NotFound: React.FC = () => {
+  const { enquiryCount } = useApp();
+
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      <Navbar cartCount={0} />
+      <Navbar enquiryCount={enquiryCount} />
       
       <main className="flex-grow pt-20 flex items-center justify-center">
         <div className="text-center px-8">

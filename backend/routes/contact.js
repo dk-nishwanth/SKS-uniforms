@@ -1,6 +1,7 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const rateLimit = require('express-rate-limit');
+const mongoose = require('mongoose');
 const emailService = require('../services/emailService');
 const smsService = require('../services/smsService');
 const Contact = require('../models/Contact');
@@ -72,20 +73,31 @@ router.post('/', contactLimiter, contactValidation, async (req, res) => {
 
     const { name, email, phone, organization, category, message, inquiryType } = req.body;
 
-    // Save contact form submission to database
-    const contactSubmission = new Contact({
-      name,
-      email,
-      phone,
-      organization,
-      category,
-      message,
-      inquiryType,
-      ipAddress: req.ip,
-      userAgent: req.get('User-Agent')
-    });
+    // Save contact form submission to database (if available)
+    let contactSubmission = null;
+    try {
+      if (mongoose.connection.readyState === 1) {
+        contactSubmission = new Contact({
+          name,
+          email,
+          phone,
+          organization,
+          category,
+          message,
+          inquiryType,
+          ipAddress: req.ip,
+          userAgent: req.get('User-Agent')
+        });
 
-    await contactSubmission.save();
+        await contactSubmission.save();
+        console.log('💾 Contact form saved to database');
+      } else {
+        console.log('⚠️ Database not available - contact form not saved');
+      }
+    } catch (dbError) {
+      console.error('❌ Database save error:', dbError.message);
+      // Continue without database save
+    }
 
     // Send email notification to business
     const emailResult = await emailService.sendContactFormEmail({
@@ -120,7 +132,7 @@ router.post('/', contactLimiter, contactValidation, async (req, res) => {
       success: true,
       message: 'Thank you for your message! We will get back to you within 24 hours.',
       data: {
-        submissionId: contactSubmission._id,
+        submissionId: contactSubmission?._id || 'no-db',
         emailSent: emailResult.success,
         smsSent: smsResults.some(result => result.success)
       }
@@ -294,6 +306,119 @@ router.post('/samples', contactLimiter, [
     res.status(500).json({
       success: false,
       message: 'Error processing sample request. Please try again.',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
+// POST /api/contact/enquiry - Submit enquiry from enquiry drawer
+router.post('/enquiry', contactLimiter, [
+  body('contactInfo.name')
+    .trim()
+    .isLength({ min: 2, max: 100 })
+    .withMessage('Name is required'),
+  body('contactInfo.email')
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Valid email is required'),
+  body('contactInfo.phone')
+    .matches(/^[\+]?[1-9][\d]{0,15}$/)
+    .withMessage('Valid phone number is required'),
+  body('message')
+    .trim()
+    .isLength({ min: 1, max: 2000 })
+    .withMessage('Message cannot be empty'),
+  body('enquiryItems')
+    .isArray({ min: 1 })
+    .withMessage('At least one item must be in the enquiry')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: errors.array()
+      });
+    }
+
+    const { contactInfo, message, enquiryItems } = req.body;
+
+    // Create detailed message with enquiry items
+    const itemsList = enquiryItems.map(item => 
+      `• ${item.name} ${item.selectedSize ? `(Size: ${item.selectedSize})` : ''} ${item.quantity ? `(Qty: ${item.quantity})` : ''} ${item.notes ? `- ${item.notes}` : ''}`
+    ).join('\n');
+
+    const fullMessage = `ENQUIRY SUBMISSION:
+
+Items Requested:
+${itemsList}
+
+Customer Message:
+${message || 'No additional message provided.'}`;
+
+    // Save enquiry to database (if available)
+    let enquirySubmission = null;
+    try {
+      if (mongoose.connection.readyState === 1) {
+        enquirySubmission = new Contact({
+          name: contactInfo.name,
+          email: contactInfo.email,
+          phone: contactInfo.phone,
+          organization: contactInfo.company,
+          message: fullMessage,
+          inquiryType: 'enquiry',
+          enquiryItems: enquiryItems,
+          ipAddress: req.ip,
+          userAgent: req.get('User-Agent')
+        });
+
+        await enquirySubmission.save();
+        console.log('💾 Enquiry saved to database');
+      } else {
+        console.log('⚠️ Database not available - enquiry not saved');
+      }
+    } catch (dbError) {
+      console.error('❌ Database save error:', dbError.message);
+      // Continue without database save
+    }
+
+    // Send email notification to business
+    const emailResult = await emailService.sendContactFormEmail({
+      name: contactInfo.name,
+      email: contactInfo.email,
+      phone: contactInfo.phone,
+      organization: contactInfo.company,
+      message: fullMessage,
+      inquiryType: 'enquiry'
+    });
+
+    // Send auto-reply email to customer
+    await emailService.sendAutoReplyEmail(contactInfo.email, contactInfo.name, 'enquiry');
+
+    // Send SMS notification to business numbers
+    const smsResults = await smsService.sendEnquiryNotification(contactInfo, enquiryItems, message);
+
+    // Log the results
+    console.log('📧 Enquiry email sent:', emailResult.success);
+    console.log('📱 Enquiry SMS results:', smsResults);
+
+    res.status(200).json({
+      success: true,
+      message: 'Thank you for your enquiry! We will get back to you within 24 hours with detailed information and pricing.',
+      data: {
+        submissionId: enquirySubmission?._id || 'no-db',
+        itemCount: enquiryItems.length,
+        emailSent: emailResult.success,
+        smsSent: smsResults.some(result => result.success)
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Enquiry submission error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Sorry, there was an error processing your enquiry. Please try again or contact us directly.',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }

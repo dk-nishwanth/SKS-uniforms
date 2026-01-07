@@ -1,10 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Product } from '../types';
-
-interface CartItem extends Product {
-  quantity: number;
-  size?: string;
-}
+import { Product, EnquiryItem } from '../types';
 
 interface User {
   id: string;
@@ -14,14 +9,13 @@ interface User {
 }
 
 interface AppContextType {
-  // Cart state
-  cartItems: CartItem[];
-  addToCart: (product: Product, size?: string) => void;
-  removeFromCart: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
-  clearCart: () => void;
-  cartTotal: number;
-  cartCount: number;
+  // Enquiry state (replacing cart)
+  enquiryItems: EnquiryItem[];
+  addToEnquiry: (product: Product, size?: string, quantity?: number, notes?: string) => void;
+  removeFromEnquiry: (productId: string) => void;
+  updateEnquiryItem: (productId: string, updates: Partial<EnquiryItem>) => void;
+  clearEnquiry: () => void;
+  enquiryCount: number;
 
   // Wishlist state
   wishlistItems: Product[];
@@ -42,20 +36,20 @@ interface AppContextType {
   performSearch: (query: string) => void;
 
   // UI state
-  isCartOpen: boolean;
-  setIsCartOpen: (open: boolean) => void;
+  isEnquiryOpen: boolean;
+  setIsEnquiryOpen: (open: boolean) => void;
   isSearchOpen: boolean;
   setIsSearchOpen: (open: boolean) => void;
   selectedProduct: Product | null;
   setSelectedProduct: (product: Product | null) => void;
 
-  // New functionality
+  // Enquiry functionality
+  submitEnquiry: (contactInfo: any, message: string) => Promise<boolean>;
   requestQuote: (productIds: string[], message: string, contactInfo: any) => Promise<boolean>;
   requestSamples: (productIds: string[], contactInfo: any) => Promise<boolean>;
   downloadCatalog: () => void;
   subscribeNewsletter: (email: string, categories: string[]) => Promise<boolean>;
   bookConsultation: (consultationType: string, contactInfo: any) => Promise<boolean>;
-  reorderItems: (orderItems: CartItem[]) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -68,13 +62,12 @@ export const useApp = () => {
   return context;
 };
 
-// All products data with comprehensive categories
+// All products data with comprehensive categories (prices removed for enquiry-based system)
 export const ALL_PRODUCTS: Product[] = [
   // School Uniforms
   {
     id: 's1',
     name: 'SCHOOL BLAZER - NAVY BLUE',
-    price: '₹2,500',
     category: 'Schools',
     subcategory: 'Blazers',
     image: '/images/School Uniform 1.png',
@@ -89,7 +82,6 @@ export const ALL_PRODUCTS: Product[] = [
   {
     id: 's2',
     name: 'SCHOOL UNIFORM SET - GREY',
-    price: '₹3,200',
     category: 'Schools',
     subcategory: 'Complete Sets',
     image: '/images/School Uniform 2.png',
@@ -99,12 +91,11 @@ export const ALL_PRODUCTS: Product[] = [
     sizes: ['XS', 'S', 'M', 'L', 'XL'],
     colors: ['Grey', 'Navy Blue'],
     material: 'Cotton Blend',
-    features: ['Complete Set', 'Professional Finish', 'Includes Tie']
+    features: ['Complete Set', 'Professional Finish', 'Durable']
   },
   {
     id: 's3',
     name: 'COLLEGE UNIFORM - FORMAL',
-    price: '₹3,800',
     category: 'Schools',
     subcategory: 'College Wear',
     image: '/images/College Uniform 1.png',
@@ -119,7 +110,6 @@ export const ALL_PRODUCTS: Product[] = [
   {
     id: 's4',
     name: 'COLLEGE UNIFORM - CASUAL',
-    price: '₹2,800',
     category: 'Schools',
     subcategory: 'College Wear',
     image: '/images/College Uniform 2.png',
@@ -136,7 +126,6 @@ export const ALL_PRODUCTS: Product[] = [
   {
     id: 'h1',
     name: 'MEDICAL SCRUBS - BLUE',
-    price: '₹1,800',
     category: 'Healthcare',
     subcategory: 'Scrubs',
     image: '/images/Medical Uniform 1.png',
@@ -151,7 +140,6 @@ export const ALL_PRODUCTS: Product[] = [
   {
     id: 'h2',
     name: 'HOSPITAL UNIFORM - WHITE',
-    price: '₹2,200',
     category: 'Healthcare',
     subcategory: 'Hospital Wear',
     image: '/images/Hospital Uniform 1.png',
@@ -166,7 +154,6 @@ export const ALL_PRODUCTS: Product[] = [
   {
     id: 'h3',
     name: 'SURGICAL SCRUBS - GREEN',
-    price: '₹2,500',
     category: 'Healthcare',
     subcategory: 'Surgical Wear',
     image: '/images/Hospital Uniform 2.png',
@@ -183,7 +170,6 @@ export const ALL_PRODUCTS: Product[] = [
   {
     id: 'c1',
     name: 'BUSINESS SUIT - CHARCOAL',
-    price: '₹8,500',
     category: 'Corporate',
     subcategory: 'Suits',
     image: '/images/Business Suit 1.png',
@@ -198,7 +184,6 @@ export const ALL_PRODUCTS: Product[] = [
   {
     id: 'c2',
     name: 'CORPORATE UNIFORM - NAVY',
-    price: '₹4,500',
     category: 'Corporate',
     subcategory: 'Office Wear',
     image: '/images/Corporate Uniform 1.png',
@@ -213,7 +198,6 @@ export const ALL_PRODUCTS: Product[] = [
   {
     id: 'c3',
     name: 'EXECUTIVE UNIFORM - BLACK',
-    price: '₹5,200',
     category: 'Corporate',
     subcategory: 'Executive Wear',
     image: '/images/Corporate Uniform 2.png',
@@ -228,7 +212,6 @@ export const ALL_PRODUCTS: Product[] = [
   {
     id: 'c4',
     name: 'HOTEL UNIFORM - BURGUNDY',
-    price: '₹3,800',
     category: 'Corporate',
     subcategory: 'Hospitality',
     image: '/images/Hotel Uniform 1.png',
@@ -243,7 +226,6 @@ export const ALL_PRODUCTS: Product[] = [
   {
     id: 'c5',
     name: 'HOTEL STAFF UNIFORM - GREY',
-    price: '₹3,200',
     category: 'Corporate',
     subcategory: 'Hospitality',
     image: '/images/Hotel Uniform 2.png',
@@ -258,7 +240,6 @@ export const ALL_PRODUCTS: Product[] = [
   {
     id: 'c6',
     name: 'BUSINESS UNIFORM - FORMAL',
-    price: '₹4,800',
     category: 'Corporate',
     subcategory: 'Business Wear',
     image: '/images/Business Uniform 1.png',
@@ -275,7 +256,6 @@ export const ALL_PRODUCTS: Product[] = [
   {
     id: 'm1',
     name: 'FORMAL SHIRT - WHITE',
-    price: '₹1,500',
     category: 'Men',
     subcategory: 'Shirts',
     image: '/images/1.png',
@@ -290,7 +270,6 @@ export const ALL_PRODUCTS: Product[] = [
   {
     id: 'm2',
     name: 'FORMAL TROUSERS - BLACK',
-    price: '₹2,200',
     category: 'Men',
     subcategory: 'Trousers',
     image: '/images/2.png',
@@ -307,7 +286,6 @@ export const ALL_PRODUCTS: Product[] = [
   {
     id: 'w1',
     name: 'FORMAL BLOUSE - WHITE',
-    price: '₹1,800',
     category: 'Women',
     subcategory: 'Blouses',
     image: '/images/3.png',
@@ -322,7 +300,6 @@ export const ALL_PRODUCTS: Product[] = [
   {
     id: 'w2',
     name: 'FORMAL SKIRT - NAVY',
-    price: '₹2,000',
     category: 'Women',
     subcategory: 'Skirts',
     image: '/images/4.png',
@@ -339,7 +316,6 @@ export const ALL_PRODUCTS: Product[] = [
   {
     id: 'a1',
     name: 'LEATHER BELT - BLACK',
-    price: '₹800',
     category: 'Accessories',
     subcategory: 'Belts',
     image: '/images/5.png',
@@ -354,7 +330,6 @@ export const ALL_PRODUCTS: Product[] = [
   {
     id: 'a2',
     name: 'FORMAL SHOES - BLACK',
-    price: '₹3,500',
     category: 'Accessories',
     subcategory: 'Shoes',
     image: '/images/1.png',
@@ -369,7 +344,6 @@ export const ALL_PRODUCTS: Product[] = [
   {
     id: 'a3',
     name: 'DRESS SOCKS - NAVY',
-    price: '₹300',
     category: 'Accessories',
     subcategory: 'Socks',
     image: '/images/2.png',
@@ -384,7 +358,6 @@ export const ALL_PRODUCTS: Product[] = [
   {
     id: 'a4',
     name: 'SILK TIE - BURGUNDY',
-    price: '₹1,200',
     category: 'Accessories',
     subcategory: 'Ties',
     image: '/images/3.png',
@@ -399,7 +372,6 @@ export const ALL_PRODUCTS: Product[] = [
   {
     id: 'a5',
     name: 'LAPTOP BAG - BLACK',
-    price: '₹2,500',
     category: 'Accessories',
     subcategory: 'Bags',
     image: '/images/4.png',
@@ -414,7 +386,6 @@ export const ALL_PRODUCTS: Product[] = [
   {
     id: 'a6',
     name: 'CUFFLINKS - SILVER',
-    price: '₹1,800',
     category: 'Accessories',
     subcategory: 'Cufflinks',
     image: '/images/5.png',
@@ -429,7 +400,6 @@ export const ALL_PRODUCTS: Product[] = [
   {
     id: 'a7',
     name: 'POCKET SQUARE - WHITE',
-    price: '₹600',
     category: 'Accessories',
     subcategory: 'Pocket Squares',
     image: '/images/1.png',
@@ -444,7 +414,6 @@ export const ALL_PRODUCTS: Product[] = [
   {
     id: 'a8',
     name: 'WATCH - PROFESSIONAL',
-    price: '₹4,500',
     category: 'Accessories',
     subcategory: 'Watches',
     image: '/images/2.png',
@@ -459,9 +428,9 @@ export const ALL_PRODUCTS: Product[] = [
 ];
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Cart state
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
+  // Enquiry state (replacing cart)
+  const [enquiryItems, setEnquiryItems] = useState<EnquiryItem[]>([]);
+  const [isEnquiryOpen, setIsEnquiryOpen] = useState(false);
 
   // Wishlist state
   const [wishlistItems, setWishlistItems] = useState<Product[]>([]);
@@ -479,12 +448,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Load data from localStorage on mount
   useEffect(() => {
-    const savedCart = localStorage.getItem('sks-cart');
+    const savedEnquiry = localStorage.getItem('sks-enquiry');
     const savedWishlist = localStorage.getItem('sks-wishlist');
     const savedUser = localStorage.getItem('sks-user');
 
-    if (savedCart) {
-      setCartItems(JSON.parse(savedCart));
+    if (savedEnquiry) {
+      setEnquiryItems(JSON.parse(savedEnquiry));
     }
     if (savedWishlist) {
       setWishlistItems(JSON.parse(savedWishlist));
@@ -494,10 +463,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, []);
 
-  // Save cart to localStorage
+  // Save enquiry to localStorage
   useEffect(() => {
-    localStorage.setItem('sks-cart', JSON.stringify(cartItems));
-  }, [cartItems]);
+    localStorage.setItem('sks-enquiry', JSON.stringify(enquiryItems));
+  }, [enquiryItems]);
 
   // Save wishlist to localStorage
   useEffect(() => {
@@ -513,47 +482,38 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [user]);
 
-  // Cart functions
-  const addToCart = (product: Product, size?: string) => {
-    setCartItems(prev => {
-      const existingItem = prev.find(item => item.id === product.id && item.size === size);
+  // Enquiry functions (replacing cart functions)
+  const addToEnquiry = (product: Product, size?: string, quantity: number = 1, notes?: string) => {
+    setEnquiryItems(prev => {
+      const existingItem = prev.find(item => item.id === product.id && item.selectedSize === size);
       if (existingItem) {
         return prev.map(item =>
-          item.id === product.id && item.size === size
-            ? { ...item, quantity: item.quantity + 1 }
+          item.id === product.id && item.selectedSize === size
+            ? { ...item, quantity: (item.quantity || 1) + quantity, notes: notes || item.notes }
             : item
         );
       }
-      return [...prev, { ...product, quantity: 1, size }];
+      return [...prev, { ...product, selectedSize: size, quantity, notes }];
     });
   };
 
-  const removeFromCart = (productId: string) => {
-    setCartItems(prev => prev.filter(item => item.id !== productId));
+  const removeFromEnquiry = (productId: string) => {
+    setEnquiryItems(prev => prev.filter(item => item.id !== productId));
   };
 
-  const updateQuantity = (productId: string, quantity: number) => {
-    if (quantity <= 0) {
-      removeFromCart(productId);
-      return;
-    }
-    setCartItems(prev =>
+  const updateEnquiryItem = (productId: string, updates: Partial<EnquiryItem>) => {
+    setEnquiryItems(prev =>
       prev.map(item =>
-        item.id === productId ? { ...item, quantity } : item
+        item.id === productId ? { ...item, ...updates } : item
       )
     );
   };
 
-  const clearCart = () => {
-    setCartItems([]);
+  const clearEnquiry = () => {
+    setEnquiryItems([]);
   };
 
-  const cartTotal = cartItems.reduce((total, item) => {
-    const price = parseFloat(item.price.replace('₹', '').replace(',', ''));
-    return total + (price * item.quantity);
-  }, 0);
-
-  const cartCount = cartItems.reduce((count, item) => count + item.quantity, 0);
+  const enquiryCount = enquiryItems.length;
 
   // Wishlist functions
   const addToWishlist = (product: Product) => {
@@ -575,36 +535,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // User functions
   const login = async (email: string, password: string): Promise<boolean> => {
-    // Simulate API call
+    // Mock login - in real app, this would call an API
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    // Mock authentication - in real app, this would be an API call
     if (email && password) {
-      const newUser: User = {
+      const mockUser: User = {
         id: '1',
         name: email.split('@')[0],
         email,
         isLoggedIn: true
       };
-      setUser(newUser);
-      return true;
-    }
-    return false;
-  };
-
-  const register = async (name: string, email: string, password: string): Promise<boolean> => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Mock registration - in real app, this would be an API call
-    if (name && email && password) {
-      const newUser: User = {
-        id: '1',
-        name,
-        email,
-        isLoggedIn: true
-      };
-      setUser(newUser);
+      setUser(mockUser);
       return true;
     }
     return false;
@@ -612,6 +553,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const logout = () => {
     setUser(null);
+  };
+
+  const register = async (name: string, email: string, password: string): Promise<boolean> => {
+    // Mock registration - in real app, this would call an API
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    if (name && email && password) {
+      const mockUser: User = {
+        id: '1',
+        name,
+        email,
+        isLoggedIn: true
+      };
+      setUser(mockUser);
+      return true;
+    }
+    return false;
   };
 
   // Search functions
@@ -624,164 +582,113 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const results = ALL_PRODUCTS.filter(product =>
       product.name.toLowerCase().includes(query.toLowerCase()) ||
       product.description.toLowerCase().includes(query.toLowerCase()) ||
-      product.category.toLowerCase().includes(query.toLowerCase())
+      product.category.toLowerCase().includes(query.toLowerCase()) ||
+      (product.subcategory && product.subcategory.toLowerCase().includes(query.toLowerCase()))
     );
-    
+
     setSearchResults(results);
   };
 
-  const requestQuote = async (productIds: string[], message: string, contactInfo: any): Promise<boolean> => {
+  // Enquiry functionality
+  const submitEnquiry = async (contactInfo: any, message: string): Promise<boolean> => {
     try {
+      // Import API service
       const { default: apiService } = await import('../services/api');
       
-      const response = await apiService.requestQuote({
-        productIds,
+      // Submit enquiry data to backend
+      const response = await apiService.submitEnquiry({
+        contactInfo,
         message,
-        contactInfo
+        enquiryItems
       });
       
       if (response.success) {
-        alert(`Quote request submitted successfully! We'll get back to you within 24 hours at ${contactInfo.email}.`);
+        console.log('Enquiry submitted successfully:', response);
         return true;
       }
       return false;
     } catch (error) {
-      console.error('Quote request error:', error);
-      alert('Error submitting quote request. Please try again or contact us directly.');
-      return false;
+      console.error('Enquiry submission error:', error);
+      throw error;
     }
+  };
+
+  const requestQuote = async (productIds: string[], message: string, contactInfo: any): Promise<boolean> => {
+    // Mock quote request
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    console.log('Quote requested:', { productIds, message, contactInfo });
+    return true;
   };
 
   const requestSamples = async (productIds: string[], contactInfo: any): Promise<boolean> => {
-    try {
-      const { default: apiService } = await import('../services/api');
-      
-      const response = await apiService.requestSamples({
-        productIds,
-        contactInfo
-      });
-      
-      if (response.success) {
-        alert(`Sample request submitted successfully! Samples will be shipped to ${contactInfo.address} within 3-5 business days.`);
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error('Sample request error:', error);
-      alert('Error submitting sample request. Please try again or contact us directly.');
-      return false;
-    }
+    // Mock sample request
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    console.log('Samples requested:', { productIds, contactInfo });
+    return true;
   };
 
   const downloadCatalog = () => {
-    // In a real app, this would download a PDF catalog
-    // For now, we'll simulate the download
-    const link = document.createElement('a');
-    link.href = 'data:text/plain;charset=utf-8,SKS Uniforms Catalog - Professional Solutions for Every Institution';
-    link.download = 'SKS-Uniforms-Catalog-2024.txt';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    alert('Catalog download started! Check your downloads folder.');
+    // Mock catalog download
+    console.log('Catalog download initiated');
+    alert('Catalog download will be available soon. Please contact us for a digital catalog.');
   };
 
   const subscribeNewsletter = async (email: string, categories: string[]): Promise<boolean> => {
-    try {
-      const { default: apiService } = await import('../services/api');
-      
-      const response = await apiService.subscribeNewsletter({
-        email,
-        categories,
-        name: email.split('@')[0] // Extract name from email
-      });
-      
-      if (response.success) {
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error('Newsletter subscription error:', error);
-      return false;
-    }
+    // Mock newsletter subscription
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    console.log('Newsletter subscription:', { email, categories });
+    return true;
   };
 
   const bookConsultation = async (consultationType: string, contactInfo: any): Promise<boolean> => {
-    try {
-      const { default: apiService } = await import('../services/api');
-      
-      const response = await apiService.bookConsultation({
-        consultationType,
-        contactInfo
-      });
-      
-      if (response.success) {
-        alert(`${consultationType} consultation booked successfully! We'll contact you at ${contactInfo.phone} to schedule the appointment.`);
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error('Consultation booking error:', error);
-      alert('Error booking consultation. Please try again or contact us directly.');
-      return false;
-    }
-  };
-
-  const reorderItems = (orderItems: CartItem[]) => {
-    // Add all items from previous order to cart
-    orderItems.forEach(item => {
-      addToCart(item, item.size);
-    });
-    
-    // Open cart to show added items
-    setIsCartOpen(true);
-    
-    alert(`${orderItems.length} items added to cart from your previous order!`);
+    // Mock consultation booking
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    console.log('Consultation booked:', { consultationType, contactInfo });
+    return true;
   };
 
   const value: AppContextType = {
-    // Cart
-    cartItems,
-    addToCart,
-    removeFromCart,
-    updateQuantity,
-    clearCart,
-    cartTotal,
-    cartCount,
-    isCartOpen,
-    setIsCartOpen,
+    // Enquiry state
+    enquiryItems,
+    addToEnquiry,
+    removeFromEnquiry,
+    updateEnquiryItem,
+    clearEnquiry,
+    enquiryCount,
 
-    // Wishlist
+    // Wishlist state
     wishlistItems,
     addToWishlist,
     removeFromWishlist,
     isInWishlist,
 
-    // User
+    // User state
     user,
     login,
     logout,
     register,
 
-    // Search
+    // Search state
     searchQuery,
     setSearchQuery,
     searchResults,
     performSearch,
+
+    // UI state
+    isEnquiryOpen,
+    setIsEnquiryOpen,
     isSearchOpen,
     setIsSearchOpen,
-
-    // UI
     selectedProduct,
     setSelectedProduct,
 
-    // New functionality
+    // Enquiry functionality
+    submitEnquiry,
     requestQuote,
     requestSamples,
     downloadCatalog,
     subscribeNewsletter,
-    bookConsultation,
-    reorderItems
+    bookConsultation
   };
 
   return (

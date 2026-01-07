@@ -1,22 +1,41 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { Product } from '../types';
 import { useApp, ALL_PRODUCTS } from '../contexts/AppContext';
+import { Heart, MessageCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Corporate: React.FC = () => {
   const { 
-    addToCart, 
-    cartCount, 
+    addToEnquiry, 
+    addToWishlist, 
+    removeFromWishlist, 
+    isInWishlist, 
+    setSelectedProduct,
+    enquiryCount,
     requestQuote, 
     downloadCatalog, 
-    bookConsultation,
-    setSelectedProduct 
+    bookConsultation
   } = useApp();
 
   // Filter corporate products from ALL_PRODUCTS
   const CORPORATE_PRODUCTS = ALL_PRODUCTS.filter(product => product.category === 'Corporate');
+
+  const handleAddToEnquiry = (product: any) => {
+    addToEnquiry(product);
+  };
+
+  const handleWishlistToggle = (product: any) => {
+    if (isInWishlist(product.id)) {
+      removeFromWishlist(product.id);
+    } else {
+      addToWishlist(product);
+    }
+  };
+
+  const handleViewDetails = (product: any) => {
+    setSelectedProduct(product);
+  };
 
   const handleExploreCollection = () => {
     // Navigate to catalog with corporate filter
@@ -91,13 +110,9 @@ const Corporate: React.FC = () => {
     downloadCatalog();
   };
 
-  const handleViewProduct = (product: Product) => {
-    setSelectedProduct(product);
-  };
-
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      <Navbar cartCount={cartCount} />
+      <Navbar enquiryCount={enquiryCount} />
       
       <main className="flex-grow pt-20">
         {/* Hero Section */}
@@ -166,32 +181,51 @@ const Corporate: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {CORPORATE_PRODUCTS.map((product) => (
                 <div key={product.id} className="group cursor-pointer border border-black hover:shadow-lg transition-all">
-                  <div className="aspect-[3/4] overflow-hidden" onClick={() => handleViewProduct(product)}>
+                  <div className="relative aspect-[3/4] overflow-hidden">
                     <img 
                       src={product.image} 
                       alt={product.name}
-                      className="w-full h-full object-cover grayscale group-hover:scale-105 transition-transform duration-700"
+                      className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                      onClick={() => handleViewDetails(product)}
                     />
-                  </div>
-                  <div className="p-6">
                     {product.isNew && (
-                      <div className="bg-amber-600 text-white text-[9px] font-bold px-2 py-1 inline-block mb-3 tracking-widest">
+                      <div className="absolute top-4 left-4 bg-amber-600 text-white text-[9px] font-bold px-2 py-1 tracking-widest">
                         NEW
                       </div>
                     )}
-                    <h3 className="font-heading text-xl mb-2 group-hover:text-amber-600 transition-colors">
+                    <button
+                      onClick={() => handleWishlistToggle(product)}
+                      className="absolute top-4 right-4 p-2 bg-white/90 rounded-full hover:bg-white transition-colors"
+                    >
+                      <Heart size={16} className={isInWishlist(product.id) ? 'fill-red-500 text-red-500' : ''} />
+                    </button>
+                    
+                    {/* Hover overlay */}
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                      <button 
+                        onClick={() => handleViewDetails(product)}
+                        className="bg-white text-black px-6 py-2 text-[10px] font-bold tracking-widest uppercase border border-black transform translate-y-12 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 hover:bg-black hover:text-white"
+                      >
+                        VIEW DETAILS
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div className="p-6">
+                    <h3 className="font-heading text-lg mb-2 group-hover:text-amber-600 transition-colors">
                       {product.name}
                     </h3>
-                    <p className="text-zinc-600 text-sm mb-4 leading-relaxed">
+                    <p className="text-zinc-600 text-sm mb-4 leading-relaxed line-clamp-2">
                       {product.description}
                     </p>
                     <div className="flex justify-between items-center">
-                      <span className="text-2xl font-bold">{product.price}</span>
+                      <span className="text-lg font-bold text-amber-600">REQUEST QUOTE</span>
                       <button 
-                        onClick={() => addToCart(product)}
-                        className="bg-black text-white px-6 py-2 text-[10px] font-bold tracking-widest uppercase hover:bg-amber-600 transition-colors"
+                        onClick={() => handleAddToEnquiry(product)}
+                        className="flex items-center gap-2 bg-black text-white px-4 py-2 text-[9px] font-bold tracking-widest uppercase hover:bg-amber-600 transition-colors"
                       >
-                        ADD TO CART
+                        <MessageCircle size={12} />
+                        ADD TO ENQUIRY
                       </button>
                     </div>
                   </div>

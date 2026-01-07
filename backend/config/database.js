@@ -2,6 +2,13 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
+    // Check if MongoDB URI is provided
+    if (!process.env.MONGODB_URI) {
+      console.warn('⚠️ MongoDB URI not provided - running without database');
+      console.warn('   Contact forms will work but data will not be persisted');
+      return;
+    }
+
     const conn = await mongoose.connect(process.env.MONGODB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -27,7 +34,7 @@ const connectDB = async () => {
 
   } catch (error) {
     console.error('❌ MongoDB connection failed:', error.message);
-    process.exit(1);
+    console.warn('⚠️ Continuing without database - contact forms will work but data will not be persisted');
   }
 };
 

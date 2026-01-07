@@ -2,24 +2,24 @@ import React from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useApp, ALL_PRODUCTS } from '../contexts/AppContext';
-import { Heart, ShoppingBag, GraduationCap } from 'lucide-react';
+import { Heart, MessageCircle, GraduationCap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Schools: React.FC = () => {
   const { 
-    addToCart, 
+    addToEnquiry, 
     addToWishlist, 
     removeFromWishlist, 
     isInWishlist, 
     setSelectedProduct,
-    cartCount 
+    enquiryCount 
   } = useApp();
 
   // Filter products for Schools category
   const schoolProducts = ALL_PRODUCTS.filter(product => product.category === 'Schools');
 
-  const handleAddToCart = (product: any) => {
-    addToCart(product);
+  const handleAddToEnquiry = (product: any) => {
+    addToEnquiry(product);
   };
 
   const handleWishlistToggle = (product: any) => {
@@ -36,7 +36,7 @@ const Schools: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      <Navbar cartCount={cartCount} />
+      <Navbar enquiryCount={enquiryCount} />
       
       <main className="flex-grow pt-20">
         {/* Hero Section */}
@@ -143,13 +143,13 @@ const Schools: React.FC = () => {
                       {product.description}
                     </p>
                     <div className="flex justify-between items-center">
-                      <span className="text-xl font-bold">{product.price}</span>
+                      <span className="text-lg font-bold text-amber-600">REQUEST QUOTE</span>
                       <button 
-                        onClick={() => handleAddToCart(product)}
+                        onClick={() => handleAddToEnquiry(product)}
                         className="flex items-center gap-2 bg-black text-white px-4 py-2 text-[9px] font-bold tracking-widest uppercase hover:bg-amber-600 transition-colors"
                       >
-                        <ShoppingBag size={12} />
-                        ADD TO CART
+                        <MessageCircle size={12} />
+                        ADD TO ENQUIRY
                       </button>
                     </div>
                   </div>

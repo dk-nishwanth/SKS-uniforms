@@ -40,7 +40,7 @@ const contactSchema = new mongoose.Schema({
   inquiryType: {
     type: String,
     required: true,
-    enum: ['general', 'quote', 'samples', 'consultation'],
+    enum: ['general', 'quote', 'samples', 'consultation', 'enquiry'],
     default: 'general'
   },
   consultationType: {
@@ -50,6 +50,15 @@ const contactSchema = new mongoose.Schema({
   productIds: [{
     type: String,
     trim: true
+  }],
+  enquiryItems: [{
+    id: String,
+    name: String,
+    category: String,
+    selectedSize: String,
+    quantity: Number,
+    notes: String,
+    image: String
   }],
   shippingAddress: {
     type: String,
@@ -131,7 +140,7 @@ contactSchema.virtual('formattedDate').get(function() {
 // Pre-save middleware
 contactSchema.pre('save', function(next) {
   // Auto-set priority based on inquiry type
-  if (this.inquiryType === 'quote') {
+  if (this.inquiryType === 'quote' || this.inquiryType === 'enquiry') {
     this.priority = 'high';
   } else if (this.inquiryType === 'samples') {
     this.priority = 'medium';

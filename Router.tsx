@@ -11,7 +11,7 @@ import Women from './pages/Women';
 import Contact from './pages/Contact';
 import Catalog from './pages/Catalog';
 import Wishlist from './pages/Wishlist';
-import Checkout from './pages/Checkout';
+import Enquiry from './pages/Enquiry';
 import Orders from './pages/Orders';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
@@ -32,7 +32,7 @@ const AppRouter: React.FC = () => {
           <Route path="/women" element={<Women />} />
           <Route path="/catalog" element={<Catalog />} />
           <Route path="/wishlist" element={<Wishlist />} />
-          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/enquiry" element={<Enquiry />} />
           <Route path="/orders" element={<Orders />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />

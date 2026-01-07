@@ -2,16 +2,16 @@ import React, { useState, useMemo } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useApp, ALL_PRODUCTS } from '../contexts/AppContext';
-import { Heart, ShoppingBag } from 'lucide-react';
+import { Heart, MessageCircle } from 'lucide-react';
 
 const Catalog: React.FC = () => {
   const { 
-    addToCart, 
+    addToEnquiry, 
     addToWishlist, 
     removeFromWishlist, 
     isInWishlist, 
     setSelectedProduct,
-    cartCount,
+    enquiryCount,
     downloadCatalog,
     requestSamples
   } = useApp();
@@ -30,10 +30,6 @@ const Catalog: React.FC = () => {
 
     return filtered.sort((a, b) => {
       switch (sortBy) {
-        case 'price-low':
-          return parseFloat(a.price.replace('₹', '').replace(',', '')) - parseFloat(b.price.replace('₹', '').replace(',', ''));
-        case 'price-high':
-          return parseFloat(b.price.replace('₹', '').replace(',', '')) - parseFloat(a.price.replace('₹', '').replace(',', ''));
         case 'name':
         default:
           return a.name.localeCompare(b.name);
@@ -41,8 +37,8 @@ const Catalog: React.FC = () => {
     });
   }, [selectedCategory, sortBy]);
 
-  const handleAddToCart = (product: any) => {
-    addToCart(product);
+  const handleAddToEnquiry = (product: any) => {
+    addToEnquiry(product);
   };
 
   const handleWishlistToggle = (product: any) => {
@@ -80,7 +76,7 @@ const Catalog: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      <Navbar cartCount={cartCount} />
+      <Navbar enquiryCount={enquiryCount} />
       
       <main className="flex-grow pt-20">
         {/* Hero Section */}
@@ -134,8 +130,6 @@ const Catalog: React.FC = () => {
                   className="text-[11px] font-bold tracking-widest uppercase px-4 py-2 border border-black bg-white focus:outline-none"
                 >
                   <option value="name">NAME</option>
-                  <option value="price-low">PRICE: LOW TO HIGH</option>
-                  <option value="price-high">PRICE: HIGH TO LOW</option>
                 </select>
               </div>
             </div>
@@ -200,13 +194,13 @@ const Catalog: React.FC = () => {
                       {product.description}
                     </p>
                     <div className="flex justify-between items-center">
-                      <span className="text-xl font-bold">{product.price}</span>
+                      <span className="text-xl font-bold">REQUEST QUOTE</span>
                       <button 
-                        onClick={() => handleAddToCart(product)}
+                        onClick={() => handleAddToEnquiry(product)}
                         className="flex items-center gap-2 bg-black text-white px-4 py-2 text-[9px] font-bold tracking-widest uppercase hover:bg-amber-600 transition-colors"
                       >
-                        <ShoppingBag size={12} />
-                        ADD TO CART
+                        <MessageCircle size={12} />
+                        ADD TO ENQUIRY
                       </button>
                     </div>
                   </div>

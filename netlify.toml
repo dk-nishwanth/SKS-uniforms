@@ -3,10 +3,7 @@
   command = "npm run build"
 
 [build.environment]
-  REACT_APP_API_URL = "https://your-backend-url.up.railway.app/api"
-  REACT_APP_CONTACT_EMAIL = "duraikannan73@gmail.com"
-  REACT_APP_CONTACT_PHONE_1 = "+91 7338031038"
-  REACT_APP_CONTACT_PHONE_2 = "+91 9980667425"
+  NODE_VERSION = "18"
 
 [[redirects]]
   from = "/*"
@@ -14,13 +11,10 @@
   status = 200
 
 [context.production.environment]
-  REACT_APP_API_URL = "https://your-backend-url.up.railway.app/api"
-  REACT_APP_CONTACT_EMAIL = "duraikannan73@gmail.com"
-  REACT_APP_CONTACT_PHONE_1 = "+91 7338031038"
-  REACT_APP_CONTACT_PHONE_2 = "+91 9980667425"
+  VITE_API_URL = "https://sks-uniforms-backend.up.railway.app/api"
 
 [context.deploy-preview.environment]
-  REACT_APP_API_URL = "https://your-backend-url.up.railway.app/api"
-  REACT_APP_CONTACT_EMAIL = "duraikannan73@gmail.com"
-  REACT_APP_CONTACT_PHONE_1 = "+91 7338031038"
-  REACT_APP_CONTACT_PHONE_2 = "+91 9980667425"
+  VITE_API_URL = "https://sks-uniforms-backend.up.railway.app/api"
+
+[context.branch-deploy.environment]
+  VITE_API_URL = "https://sks-uniforms-backend.up.railway.app/api"

@@ -1,11 +1,14 @@
 import React from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import { useApp } from '../contexts/AppContext';
 
 const TermsOfService: React.FC = () => {
+  const { enquiryCount } = useApp();
+
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      <Navbar cartCount={0} />
+      <Navbar enquiryCount={enquiryCount} />
       
       <main className="flex-grow pt-20">
         {/* Hero Section */}
