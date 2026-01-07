@@ -1,0 +1,47 @@
+/* Mobile Navbar Clean Integration */
+@media (max-width: 768px) {
+  header[data-navbar] {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 9999 !important;
+    width: 100% !important;
+  }
+  
+  /* Completely transparent navbar */
+  header[data-navbar].transparent {
+    background: transparent !important;
+    border: none !important;
+    backdrop-filter: none !important;
+  }
+  
+  /* Mobile elements - black text, no shadows */
+  header[data-navbar].transparent .mobile-menu-btn button {
+    color: black !important;
+  }
+  
+  header[data-navbar].transparent .navbar-logo a {
+    color: black !important;
+  }
+  
+  header[data-navbar].transparent .navbar-icons button,
+  header[data-navbar].transparent .navbar-icons a {
+    color: black !important;
+  }
+  
+  header[data-navbar].transparent * {
+    color: black !important;
+  }
+}
+
+/* Desktop - white text, no shadows */
+@media (min-width: 769px) {
+  header[data-navbar].transparent {
+    background: transparent !important;
+  }
+  
+  header[data-navbar].transparent * {
+    color: white !important;
+  }
+}
