@@ -53,7 +53,7 @@ const Contact: React.FC = () => {
       const response = await apiService.submitContactForm(formData);
       
       if (response.success) {
-        setSubmitMessage('Thank you for your inquiry! We will get back to you within 24 hours. Your message has been sent to our team and SMS notifications have been dispatched.');
+        setSubmitMessage('Thank you for your inquiry! We will get back to you within 24 hours. Your message has been sent to our team.');
         setFormData({
           name: '',
           email: '',
@@ -63,13 +63,15 @@ const Contact: React.FC = () => {
           message: '',
           inquiryType: 'general'
         });
+      } else {
+        setSubmitMessage('There was an issue with your submission. Please try again or contact us directly.');
       }
     } catch (error) {
       console.error('Contact form submission error:', error);
-      setSubmitMessage('There was an error submitting your message. Please try again or contact us directly at duraikannan73@gmail.com or call +91 7338031038.');
+      setSubmitMessage(`There was an error submitting your message. Please try again or contact us directly at duraikannan73@gmail.com or call +91 7338031038.`);
     } finally {
       setIsSubmitting(false);
-      setTimeout(() => setSubmitMessage(''), 8000);
+      setTimeout(() => setSubmitMessage(''), 10000);
     }
   };
 

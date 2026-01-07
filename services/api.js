@@ -21,7 +21,7 @@ class ApiService {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'API request failed');
+        throw new Error(data.message || `API request failed with status ${response.status}`);
       }
 
       return data;

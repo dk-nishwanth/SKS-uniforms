@@ -61,9 +61,12 @@ const contactValidation = [
 // POST /api/contact - Submit contact form
 router.post('/', contactLimiter, contactValidation, async (req, res) => {
   try {
+    console.log('📝 Contact form submission received:', req.body);
+    
     // Check for validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('❌ Validation errors:', errors.array());
       return res.status(400).json({
         success: false,
         message: 'Validation failed',
@@ -72,6 +75,8 @@ router.post('/', contactLimiter, contactValidation, async (req, res) => {
     }
 
     const { name, email, phone, organization, category, message, inquiryType } = req.body;
+    
+    console.log('✅ Validation passed, processing contact form...');
 
     // Save contact form submission to database (if available)
     let contactSubmission = null;
@@ -100,29 +105,46 @@ router.post('/', contactLimiter, contactValidation, async (req, res) => {
     }
 
     // Send email notification to business
-    const emailResult = await emailService.sendContactFormEmail({
-      name,
-      email,
-      phone,
-      organization,
-      category,
-      message,
-      inquiryType
-    });
+    let emailResult = { success: false };
+    try {
+      emailResult = await emailService.sendContactFormEmail({
+        name,
+        email,
+        phone,
+        organization,
+        category,
+        message,
+        inquiryType
+      });
+      console.log('📧 Email result:', emailResult.success);
+    } catch (emailError) {
+      console.log('⚠️ Email sending failed (expected in development):', emailError.message);
+    }
 
     // Send auto-reply email to customer
-    await emailService.sendAutoReplyEmail(email, name, inquiryType);
+    try {
+      await emailService.sendAutoReplyEmail(email, name, inquiryType);
+      console.log('📧 Auto-reply sent');
+    } catch (emailError) {
+      console.log('⚠️ Auto-reply failed (expected in development):', emailError.message);
+    }
 
     // Send SMS notification to business numbers
-    const smsResults = await smsService.sendContactNotification({
-      name,
-      email,
-      phone,
-      organization,
-      category,
-      message,
-      inquiryType
-    });
+    let smsResults = [];
+    try {
+      smsResults = await smsService.sendContactNotification({
+        name,
+        email,
+        phone,
+        organization,
+        category,
+        message,
+        inquiryType
+      });
+      console.log('📱 SMS results:', smsResults);
+    } catch (smsError) {
+      console.log('⚠️ SMS sending failed (expected in development):', smsError.message);
+    }
 
     // Log the results
     console.log('📧 Email sent:', emailResult.success);
